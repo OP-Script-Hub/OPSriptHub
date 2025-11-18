@@ -2,18 +2,18 @@ local player = game.Players.LocalPlayer
 local PlayerGui = player:WaitForChild("PlayerGui")
 local StarterGui = game:GetService("StarterGui")
 
--- Disable ALL Roblox CoreGui (chat, leaderboard, backpack etc.)
+-- Disable ALL Roblox CoreGui
 StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.All, false)
 
--- Create main ScreenGui
+-- Main ScreenGui
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "LoadingScreen"
 screenGui.ResetOnSpawn = false
 screenGui.IgnoreGuiInset = true
-screenGui.DisplayOrder = 999999 -- always on top
+screenGui.DisplayOrder = 999999
 screenGui.Parent = PlayerGui
 
--- Fullscreen black background
+-- Fullscreen background
 local bg = Instance.new("Frame")
 bg.Size = UDim2.fromScale(1, 1)
 bg.Position = UDim2.fromScale(0, 0)
@@ -21,11 +21,18 @@ bg.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 bg.BorderSizePixel = 0
 bg.Parent = screenGui
 
--- Top text: "PREPARING SCRIPT PLEASE WAIT..."
+-- Parent frame to group everything in center
+local groupFrame = Instance.new("Frame")
+groupFrame.Size = UDim2.new(0.7, 0, 0.6, 0) -- increased height for spacing
+groupFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+groupFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+groupFrame.BackgroundTransparency = 1
+groupFrame.Parent = bg
+
+-- Top text
 local prepLabel = Instance.new("TextLabel")
-prepLabel.Size = UDim2.new(0.6, 0, 0.1, 0)
-prepLabel.Position = UDim2.new(0.5, 0, 0.4, 0)
-prepLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+prepLabel.Size = UDim2.new(1, 0, 0.15, 0)
+prepLabel.Position = UDim2.new(0, 0, 0, 0)
 prepLabel.BackgroundTransparency = 1
 prepLabel.Text = "PREPARING SCRIPT PLEASE WAIT..."
 prepLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -34,16 +41,15 @@ prepLabel.TextScaled = true
 prepLabel.TextStrokeTransparency = 0
 prepLabel.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
 prepLabel.RichText = true
-prepLabel.Parent = bg
+prepLabel.Parent = groupFrame
 
--- Loading bar container
+-- Loading bar container with padding
 local barContainer = Instance.new("Frame")
-barContainer.AnchorPoint = Vector2.new(0.5, 0.5)
-barContainer.Position = UDim2.new(0.5, 0, 0.5, 0)
-barContainer.Size = UDim2.new(0.6, 0, 0.06, 0)
+barContainer.Size = UDim2.new(1, 0, 0.08, 0) -- slightly smaller height
+barContainer.Position = UDim2.new(0, 0, 0.35, 0) -- add space from top text
 barContainer.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 barContainer.BorderSizePixel = 0
-barContainer.Parent = bg
+barContainer.Parent = groupFrame
 
 -- Loading bar fill
 local barFill = Instance.new("Frame")
@@ -52,16 +58,15 @@ barFill.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
 barFill.BorderSizePixel = 0
 barFill.Parent = barContainer
 
--- Features text below loading bar (smaller)
+-- Features text below the loading bar with padding
 local featuresLabel = Instance.new("TextLabel")
-featuresLabel.Size = UDim2.new(0.6, 0, 0.3, 0)
-featuresLabel.Position = UDim2.new(0.5, 0, 0.6, 0)
-featuresLabel.AnchorPoint = Vector2.new(0.5, 0)
+featuresLabel.Size = UDim2.new(1, 0, 0.35, 0) -- enough space for list
+featuresLabel.Position = UDim2.new(0, 0, 0.5, 0) -- add space below loading bar
 featuresLabel.BackgroundTransparency = 1
 featuresLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 featuresLabel.Font = Enum.Font.Arimo
 featuresLabel.TextScaled = false
-featuresLabel.TextSize = 18 -- ~75% size
+featuresLabel.TextSize = 18
 featuresLabel.TextStrokeTransparency = 0
 featuresLabel.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
 featuresLabel.RichText = true
@@ -76,8 +81,9 @@ SCRIPT FEATURES:
 • inf jump
 ]]
 featuresLabel.TextWrapped = true
+featuresLabel.TextXAlignment = Enum.TextXAlignment.Left
 featuresLabel.TextYAlignment = Enum.TextYAlignment.Top
-featuresLabel.Parent = bg
+featuresLabel.Parent = groupFrame
 
 --|| SOUND CONTROL ||--
 local function muteAllSounds()
@@ -100,7 +106,6 @@ local function unmuteAllSounds()
     end
 end
 
--- Mute new sounds if created while loading
 workspace.DescendantAdded:Connect(function(desc)
     if desc:IsA("Sound") then
         desc:SetAttribute("OriginalVolume", desc.Volume)
@@ -124,7 +129,6 @@ end
 --|| CLEANUP ||--
 unmuteAllSounds()
 
--- Fade out effect
 for t = 1, 25 do
     local transparency = t / 25
     bg.BackgroundTransparency = transparency
@@ -135,6 +139,5 @@ for t = 1, 25 do
     task.wait(0.02)
 end
 
--- Destroy GUI and re-enable Core UI
 screenGui:Destroy()
 StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.All, true)

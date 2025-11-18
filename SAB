@@ -21,10 +21,10 @@ bg.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 bg.BorderSizePixel = 0
 bg.Parent = screenGui
 
--- Parent frame to group everything in center
+-- Parent frame to group everything in center (slightly moved upward)
 local groupFrame = Instance.new("Frame")
 groupFrame.Size = UDim2.new(0.7, 0, 0.6, 0)
-groupFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+groupFrame.Position = UDim2.new(0.5, 0, 0.45, 0) -- moved upward from 0.5 to 0.45
 groupFrame.AnchorPoint = Vector2.new(0.5, 0.5)
 groupFrame.BackgroundTransparency = 1
 groupFrame.Parent = bg
@@ -132,7 +132,7 @@ end)
 muteAllSounds()
 
 --|| LOADING BAR ANIMATION ||--
-local TOTAL_TIME = 600 -- 10 minutes
+local TOTAL_TIME = 300 -- 5 minutes
 local updateRate = 0.05
 local steps = TOTAL_TIME / updateRate
 

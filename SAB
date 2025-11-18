@@ -1,16 +1,23 @@
 local player = game.Players.LocalPlayer
 local PlayerGui = player:WaitForChild("PlayerGui")
+local StarterGui = game:GetService("StarterGui")
+
+-- Disable ALL Roblox CoreGui (chat, leaderboard, backpack etc.)
+StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.All, false)
 
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "LoadingScreen"
 screenGui.ResetOnSpawn = false
 screenGui.IgnoreGuiInset = true -- FULLSCREEN FIX
+screenGui.DisplayOrder = 999999 -- ALWAYS ON TOP
 screenGui.Parent = PlayerGui
 
 -- Fullscreen background
 local bg = Instance.new("Frame")
-bg.Size = UDim2.new(1, 0, 1, 0)
+bg.Size = UDim2.fromScale(1, 1)
+bg.Position = UDim2.fromScale(0, 0)
 bg.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+bg.BorderSizePixel = 0
 bg.Parent = screenGui
 
 -- Loading bar container
@@ -97,4 +104,8 @@ for t = 1, 25 do
 	task.wait(0.02)
 end
 
+-- Destroy GUI
 screenGui:Destroy()
+
+-- Re-enable Core UI after loading
+StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.All, true)

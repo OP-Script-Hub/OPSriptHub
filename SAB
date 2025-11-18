@@ -2,29 +2,40 @@ local player = game.Players.LocalPlayer
 local PlayerGui = player:WaitForChild("PlayerGui")
 local StarterGui = game:GetService("StarterGui")
 
--- Disable ALL Roblox CoreGui (chat, leaderboard, backpack etc.)
 StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.All, false)
 
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "LoadingScreen"
 screenGui.ResetOnSpawn = false
-screenGui.IgnoreGuiInset = true -- FULLSCREEN FIX
-screenGui.DisplayOrder = 999999 -- ALWAYS ON TOP
+screenGui.IgnoreGuiInset = true
+screenGui.DisplayOrder = 999999
 screenGui.Parent = PlayerGui
 
--- Fullscreen background
-local bg = Instance.new("Frame")
+-- Fullscreen background image
+local bg = Instance.new("ImageLabel")
 bg.Size = UDim2.fromScale(1, 1)
 bg.Position = UDim2.fromScale(0, 0)
-bg.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+bg.BackgroundColor3 = Color3.fromRGB(0, 0, 0) -- fallback color
+bg.BackgroundTransparency = 0
 bg.BorderSizePixel = 0
+bg.Image = "rbxassetid://105837184787453" -- Your background image asset ID
+bg.ScaleType = Enum.ScaleType.Crop
 bg.Parent = screenGui
 
--- Loading bar container
+-- *** CUSTOM IMAGE / LOGO ***
+local logo = Instance.new("ImageLabel")
+logo.AnchorPoint = Vector2.new(0.5, 0.5)
+logo.Position = UDim2.new(0.5, 0, 0.35, 0) -- centered above bar
+logo.Size = UDim2.new(0.3, 0, 0.3, 0) -- adjust as needed
+logo.BackgroundTransparency = 1
+logo.Image = "rbxassetid://YOUR_IMAGE_ID_HERE"  -- <<< Put your logo image ID here
+logo.Parent = bg
+
+-- Centered loading bar container
 local barContainer = Instance.new("Frame")
 barContainer.AnchorPoint = Vector2.new(0.5, 0.5)
-barContainer.Position = UDim2.new(0.5, 0, 0.85, 0)
-barContainer.Size = UDim2.new(0.6, 0, 0.06, 0)
+barContainer.Position = UDim2.new(0.5, 0, 0.7, 0) -- centered vertically
+barContainer.Size = UDim2.new(0.45, 0, 0.05, 0)
 barContainer.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 barContainer.BorderSizePixel = 0
 barContainer.Parent = bg
@@ -36,19 +47,19 @@ barFill.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
 barFill.BorderSizePixel = 0
 barFill.Parent = barContainer
 
--- Loading text
+-- Centered loading text
 local label = Instance.new("TextLabel")
 label.BackgroundTransparency = 1
-label.Size = UDim2.new(1, 0, 0.1, 0)
-label.Position = UDim2.new(0, 0, 0.7, 0)
+label.AnchorPoint = Vector2.new(0.5, 0.5)
+label.Position = UDim2.new(0.5, 0, 0.8, 0)
+label.Size = UDim2.new(0.4, 0, 0.07, 0)
 label.Text = "Loading..."
 label.TextColor3 = Color3.fromRGB(255, 255, 255)
 label.TextScaled = true
 label.Font = Enum.Font.SourceSansBold
 label.Parent = bg
 
---|| SOUND CONTROL ||--
-
+-- SOUND CONTROL
 local function muteAllSounds()
 	for _, obj in pairs(workspace:GetDescendants()) do
 		if obj:IsA("Sound") then
@@ -69,7 +80,6 @@ local function unmuteAllSounds()
 	end
 end
 
--- Mute new sounds if created while loading
 workspace.DescendantAdded:Connect(function(desc)
 	if desc:IsA("Sound") then
 		desc:SetAttribute("OriginalVolume", desc.Volume)
@@ -79,10 +89,9 @@ end)
 
 muteAllSounds()
 
---|| LOADING BAR ANIMATION (10 minutes total) ||--
-
-local TOTAL_TIME = 600 -- 10 minutes
-local updateRate = 0.05 -- Smooth animation  
+-- LOADING BAR ANIMATION (10 min)
+local TOTAL_TIME = 600
+local updateRate = 0.05
 local steps = TOTAL_TIME / updateRate
 
 for i = 1, steps do
@@ -91,21 +100,18 @@ for i = 1, steps do
 	task.wait(updateRate)
 end
 
---|| CLEANUP ||--
-
+-- CLEANUP
 unmuteAllSounds()
 
--- Fade out effect
+-- Fade out
 for t = 1, 25 do
 	bg.BackgroundTransparency = t / 25
 	barContainer.BackgroundTransparency = t / 25
 	barFill.BackgroundTransparency = t / 25
 	label.TextTransparency = t / 25
+	logo.ImageTransparency = t / 25
 	task.wait(0.02)
 end
 
--- Destroy GUI
 screenGui:Destroy()
-
--- Re-enable Core UI after loading
 StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.All, true)

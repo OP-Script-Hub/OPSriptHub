@@ -1,3 +1,7 @@
+Skip to content
+Chat history
+
+You said:
 
 local player = game.Players.LocalPlayer
 local PlayerGui = player:WaitForChild("PlayerGui")
@@ -104,3 +108,156 @@ for t = 1, 25 do
 end
 
 screenGui:Destroy()
+
+The Script is not totally full screen
+ChatGPT said:
+It is fullscreen horizontally, but not fullscreen on some devices because ScreenGui.IgnoreGuiInset is missing.
+
+Roblox adds a top-left GUI inset (for the playerlist / safe area), so your UI is shifted down unless you disable it.
+
+✅ Fix: Add this line after creating the ScreenGui
+screenGui.IgnoreGuiInset = true
+📌 Why this fixes it
+Without IgnoreGuiInset, Roblox automatically applies a padding at the top of all GUIs.
+This makes your black background and loading bar not fully cover the screen, especially on:
+
+Mobile
+
+Tablets
+
+Some PC resolutions
+
+With IgnoreGuiInset = true, the UI starts at full screen (0,0) with no padding.
+
+📂 Final corrected beginning of script
+local player = game.Players.LocalPlayer
+local PlayerGui = player:WaitForChild("PlayerGui")
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "LoadingScreen"
+screenGui.ResetOnSpawn = false
+screenGui.IgnoreGuiInset = true  -- IMPORTANT: Make it fully fullscreen
+screenGui.Parent = PlayerGui
+That alone will make your UI truly edge-to-edge fullscreen.
+
+If you'd like, I can also help you make it mobile-responsive or add a smoother fade.
+
+You said:
+give me the revised script
+ChatGPT said:
+Here is your fully revised, fixed, and cleaned-up script with
+✔ IgnoreGuiInset enabled (fullscreen fix)
+✔ Everything else untouched
+
+✅ Revised Full Script
+local player = game.Players.LocalPlayer
+local PlayerGui = player:WaitForChild("PlayerGui")
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "LoadingScreen"
+screenGui.ResetOnSpawn = false
+screenGui.IgnoreGuiInset = true -- FULLSCREEN FIX
+screenGui.Parent = PlayerGui
+
+-- Fullscreen background
+local bg = Instance.new("Frame")
+bg.Size = UDim2.new(1, 0, 1, 0)
+bg.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+bg.Parent = screenGui
+
+-- Loading bar container
+local barContainer = Instance.new("Frame")
+barContainer.AnchorPoint = Vector2.new(0.5, 0.5)
+barContainer.Position = UDim2.new(0.5, 0, 0.85, 0)
+barContainer.Size = UDim2.new(0.6, 0, 0.06, 0)
+barContainer.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+barContainer.BorderSizePixel = 0
+barContainer.Parent = bg
+
+-- Loading bar fill
+local barFill = Instance.new("Frame")
+barFill.Size = UDim2.new(0, 0, 1, 0)
+barFill.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+barFill.BorderSizePixel = 0
+barFill.Parent = barContainer
+
+-- Loading text
+local label = Instance.new("TextLabel")
+label.BackgroundTransparency = 1
+label.Size = UDim2.new(1, 0, 0.1, 0)
+label.Position = UDim2.new(0, 0, 0.7, 0)
+label.Text = "Loading..."
+label.TextColor3 = Color3.fromRGB(255, 255, 255)
+label.TextScaled = true
+label.Font = Enum.Font.SourceSansBold
+label.Parent = bg
+
+--|| SOUND CONTROL ||--
+
+local function muteAllSounds()
+	for _, obj in pairs(workspace:GetDescendants()) do
+		if obj:IsA("Sound") then
+			obj:SetAttribute("OriginalVolume", obj.Volume)
+			obj.Volume = 0
+		end
+	end
+end
+
+local function unmuteAllSounds()
+	for _, obj in pairs(workspace:GetDescendants()) do
+		if obj:IsA("Sound") then
+			local original = obj:GetAttribute("OriginalVolume")
+			if original then
+				obj.Volume = original
+			end
+		end
+	end
+end
+
+-- Mute new sounds if created while loading
+workspace.DescendantAdded:Connect(function(desc)
+	if desc:IsA("Sound") then
+		desc:SetAttribute("OriginalVolume", desc.Volume)
+		desc.Volume = 0
+	end
+end)
+
+muteAllSounds()
+
+--|| LOADING BAR ANIMATION (10 minutes total) ||--
+
+local TOTAL_TIME = 600 -- 10 minutes
+local updateRate = 0.05 -- Smooth animation  
+local steps = TOTAL_TIME / updateRate
+
+for i = 1, steps do
+	local progress = i / steps
+	barFill.Size = UDim2.new(progress, 0, 1, 0)
+	task.wait(updateRate)
+end
+
+--|| CLEANUP ||--
+
+unmuteAllSounds()
+
+-- Fade out effect
+for t = 1, 25 do
+	bg.BackgroundTransparency = t / 25
+	barContainer.BackgroundTransparency = t / 25
+	barFill.BackgroundTransparency = t / 25
+	label.TextTransparency = t / 25
+	task.wait(0.02)
+end
+
+screenGui:Destroy()
+If you want, I can also:
+✔ add a loading spinner
+✔ make the UI scale perfectly on all devices
+✔ improve the fade & bar animation
+✔ make the loading time dynamic instead of fixed 10 minutes
+
+
+
+
+No file chosenNo file chosen
+ChatGPT can make mistakes. Check important info.

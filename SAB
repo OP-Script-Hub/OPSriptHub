@@ -21,7 +21,7 @@ bg.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 bg.BorderSizePixel = 0
 bg.Parent = screenGui
 
--- Parent frame to group top text, loading bar, and features text
+-- Parent frame to group everything in center
 local groupFrame = Instance.new("Frame")
 groupFrame.Size = UDim2.new(0.7, 0, 0.6, 0)
 groupFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
@@ -29,7 +29,7 @@ groupFrame.AnchorPoint = Vector2.new(0.5, 0.5)
 groupFrame.BackgroundTransparency = 1
 groupFrame.Parent = bg
 
--- Top text: "PREPARING SCRIPT PLEASE WAIT..."
+-- Top text
 local prepLabel = Instance.new("TextLabel")
 prepLabel.Size = UDim2.new(1, 0, 0.15, 0)
 prepLabel.Position = UDim2.new(0, 0, 0, 0)
@@ -41,6 +41,7 @@ prepLabel.TextScaled = true
 prepLabel.TextStrokeTransparency = 0
 prepLabel.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
 prepLabel.RichText = true
+prepLabel.TextXAlignment = Enum.TextXAlignment.Center
 prepLabel.Parent = groupFrame
 
 -- Loading bar container
@@ -58,11 +59,10 @@ barFill.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
 barFill.BorderSizePixel = 0
 barFill.Parent = barContainer
 
--- Features text below the loading bar, centered frame but left-aligned text
+-- Bottom features text, centered
 local featuresLabel = Instance.new("TextLabel")
 featuresLabel.Size = UDim2.new(1, 0, 0.35, 0)
 featuresLabel.Position = UDim2.new(0, 0, 0.5, 0)
-featuresLabel.AnchorPoint = Vector2.new(0.5, 0) -- center the frame horizontally
 featuresLabel.BackgroundTransparency = 1
 featuresLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 featuresLabel.Font = Enum.Font.Arimo
@@ -73,6 +73,7 @@ featuresLabel.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
 featuresLabel.RichText = true
 featuresLabel.Text = [[
 SCRIPT FEATURES:
+-
 • DUPE 50+ M/S Brainrot
 • brainrot spawner
 • Desync stealer
@@ -82,7 +83,7 @@ SCRIPT FEATURES:
 • inf jump
 ]]
 featuresLabel.TextWrapped = true
-featuresLabel.TextXAlignment = Enum.TextXAlignment.Left -- keep text left-aligned
+featuresLabel.TextXAlignment = Enum.TextXAlignment.Center -- CENTER all text
 featuresLabel.TextYAlignment = Enum.TextYAlignment.Top
 featuresLabel.Parent = groupFrame
 

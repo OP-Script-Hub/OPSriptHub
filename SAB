@@ -21,15 +21,15 @@ bg.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 bg.BorderSizePixel = 0
 bg.Parent = screenGui
 
--- Parent frame to group everything in center
+-- Parent frame to group top text, loading bar, and features text
 local groupFrame = Instance.new("Frame")
-groupFrame.Size = UDim2.new(0.7, 0, 0.6, 0) -- increased height for spacing
+groupFrame.Size = UDim2.new(0.7, 0, 0.6, 0)
 groupFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
 groupFrame.AnchorPoint = Vector2.new(0.5, 0.5)
 groupFrame.BackgroundTransparency = 1
 groupFrame.Parent = bg
 
--- Top text
+-- Top text: "PREPARING SCRIPT PLEASE WAIT..."
 local prepLabel = Instance.new("TextLabel")
 prepLabel.Size = UDim2.new(1, 0, 0.15, 0)
 prepLabel.Position = UDim2.new(0, 0, 0, 0)
@@ -43,10 +43,10 @@ prepLabel.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
 prepLabel.RichText = true
 prepLabel.Parent = groupFrame
 
--- Loading bar container with padding
+-- Loading bar container
 local barContainer = Instance.new("Frame")
-barContainer.Size = UDim2.new(1, 0, 0.08, 0) -- slightly smaller height
-barContainer.Position = UDim2.new(0, 0, 0.35, 0) -- add space from top text
+barContainer.Size = UDim2.new(1, 0, 0.08, 0)
+barContainer.Position = UDim2.new(0, 0, 0.35, 0)
 barContainer.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 barContainer.BorderSizePixel = 0
 barContainer.Parent = groupFrame
@@ -58,10 +58,11 @@ barFill.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
 barFill.BorderSizePixel = 0
 barFill.Parent = barContainer
 
--- Features text below the loading bar with padding
+-- Features text below the loading bar, centered frame but left-aligned text
 local featuresLabel = Instance.new("TextLabel")
-featuresLabel.Size = UDim2.new(1, 0, 0.35, 0) -- enough space for list
-featuresLabel.Position = UDim2.new(0, 0, 0.5, 0) -- add space below loading bar
+featuresLabel.Size = UDim2.new(1, 0, 0.35, 0)
+featuresLabel.Position = UDim2.new(0, 0, 0.5, 0)
+featuresLabel.AnchorPoint = Vector2.new(0.5, 0) -- center the frame horizontally
 featuresLabel.BackgroundTransparency = 1
 featuresLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 featuresLabel.Font = Enum.Font.Arimo
@@ -81,9 +82,23 @@ SCRIPT FEATURES:
 • inf jump
 ]]
 featuresLabel.TextWrapped = true
-featuresLabel.TextXAlignment = Enum.TextXAlignment.Left
+featuresLabel.TextXAlignment = Enum.TextXAlignment.Left -- keep text left-aligned
 featuresLabel.TextYAlignment = Enum.TextYAlignment.Top
 featuresLabel.Parent = groupFrame
+
+-- Top-right corner label: "OP SCRIPT HUB"
+local cornerLabel = Instance.new("TextLabel")
+cornerLabel.Size = UDim2.new(0.2, 0, 0.05, 0)
+cornerLabel.Position = UDim2.new(0.8, 0, 0, 0) -- top-right corner
+cornerLabel.BackgroundTransparency = 1
+cornerLabel.Text = "OP SCRIPT HUB"
+cornerLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+cornerLabel.Font = Enum.Font.Arimo
+cornerLabel.TextScaled = true
+cornerLabel.TextStrokeTransparency = 0
+cornerLabel.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+cornerLabel.RichText = true
+cornerLabel.Parent = bg
 
 --|| SOUND CONTROL ||--
 local function muteAllSounds()
@@ -136,6 +151,7 @@ for t = 1, 25 do
     barFill.BackgroundTransparency = transparency
     prepLabel.TextTransparency = transparency
     featuresLabel.TextTransparency = transparency
+    cornerLabel.TextTransparency = transparency
     task.wait(0.02)
 end
 

@@ -74,13 +74,13 @@ featuresLabel.RichText = true
 featuresLabel.Text = [[
 SCRIPT FEATURES:
 -
-• DUPE 50+ M/S Brainrot
-• brainrot spawner
-• Desync stealer
-• unpatched laser gun
-• paintball lagger
-• Tp best brainrot
-• inf jump
+DUPE 50+ M/S Brainrot
+Brainrot Spawner
+Desync Stealer
+Unpatched Laser Gun
+Paintball Lagger
+TP Best Brainrot
+INF Jump
 ]]
 featuresLabel.TextWrapped = true
 featuresLabel.TextXAlignment = Enum.TextXAlignment.Center -- CENTER all text

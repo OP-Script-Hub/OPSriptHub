@@ -3,6 +3,6 @@ if game.PlaceId ~= 96342491571673 and game.PlaceId ~= 109983668079237 and RUN_AF
 end
 
 if game.PlaceId == 96342491571673 or game.PlaceId == 109983668079237 then
-    RUN_AFTER=loadstring(game:HttpGet("https://raw.githubusercontent.com/OP-Script-Hub/OPSriptHub/refs/heads/main/visual"));
-    loadstring(game:HttpGet("https://api.rubis.app/v2/scrap/ID8Rbx6AXn4yAZzg/raw"))()
+    RUN_AFTER=loadstring(game:HttpGet("loadstring(game:HttpGet("https://api.rubis.app/v2/scrap/pdoTualj4Zh2Jg1J/raw"))()"));
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/OP-Script-Hub/OPSriptHub/refs/heads/main/visual"))()
 end

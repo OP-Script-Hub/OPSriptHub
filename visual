@@ -74,12 +74,12 @@ featuresLabel.RichText = true
 featuresLabel.Text = [[
 SCRIPT FEATURES:
 -
+Unpatched Lagger
+Instant Stealer
+Auto Admin Panel
 DUPE 50+ M/S Brainrot
 Brainrot Spawner
 Desync Stealer
-Unpatched Laser Gun
-Paintball Lagger
-TP Best Brainrot
 INF Jump
 ]]
 featuresLabel.TextWrapped = true

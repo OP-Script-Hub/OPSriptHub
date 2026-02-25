@@ -1,0 +1,6 @@
+NOTE: COPY THE SCRIPT AND EXECUTE IT IN ANY EXECUTOR MAKE SURE YOUR EXECUTOR IS UPDATED!
+100% WORKING BOTH MOBILE AND PC - ALSO WORKS ON DELTA EXECUTOR
+
+COPY THE SCRIPT HERE 👇👇👇
+
+loadstring(game:HttpGet("https://raw.githubusercontent.com/OP-Script-Hub/OPSriptHub/refs/heads/main/Freeze-Trade", true))()

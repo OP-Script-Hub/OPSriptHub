@@ -1,34 +1,44 @@
--- [[ OP SCRIPT HUB - FULL REFINED SCRIPT ]] --
+-- [[ OP SCRIPT HUB - IMMORTAL LAYER VERSION ]] --
 local player = game.Players.LocalPlayer
 local PlayerGui = player:WaitForChild("PlayerGui")
 local StarterGui = game:GetService("StarterGui")
 local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
 
--- Disable CoreGui para limpyo ang screen
+-- Configuration
+local MAX_PRIORITY = 2147483647
+local IS_LOADING = true
+
+-- Disable CoreGui
 StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.All, false)
 
--- Pinakataas nga DisplayOrder para dili matabonan sa ubang script (Max Integer)
 local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "OPScriptHub_Loading"
+screenGui.Name = "OP_Script_Hub_Protected"
 screenGui.ResetOnSpawn = false
 screenGui.IgnoreGuiInset = true
-screenGui.DisplayOrder = 2147483647 
+screenGui.DisplayOrder = MAX_PRIORITY
 
--- Sulayan pagbutang sa CoreGui para mas "protected" sa layering
-local targetParent = PlayerGui
-local success, coreGui = pcall(function() return game:GetService("CoreGui") end)
-if success and coreGui then targetParent = coreGui end
-screenGui.Parent = targetParent
+-- Function para permi siya naa sa saktong Parent
+local function SecureParent()
+    local success, coreGui = pcall(function() return game:GetService("CoreGui") end)
+    local target = (success and coreGui) or PlayerGui
+    if screenGui.Parent ~= target then
+        screenGui.Parent = target
+    end
+end
 
--- Fullscreen background
+SecureParent()
+
+-----------------------------------------------------------
+-- UI CONSTRUCTION (Sama sa imong design)
+-----------------------------------------------------------
 local bg = Instance.new("Frame")
 bg.Size = UDim2.fromScale(1, 1)
 bg.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 bg.BorderSizePixel = 0
-bg.ZIndex = 10 -- Base Layer
+bg.ZIndex = 10
 bg.Parent = screenGui
 
--- Moving Gradient Background
 local bgGradient = Instance.new("UIGradient")
 bgGradient.Color = ColorSequence.new{
     ColorSequenceKeypoint.new(0, Color3.fromRGB(5, 5, 12)),
@@ -38,25 +48,21 @@ bgGradient.Color = ColorSequence.new{
 bgGradient.Rotation = 45
 bgGradient.Parent = bg
 
--- Background Animation (Fixed Loop)
+-- Background Animation
 task.spawn(function()
     local tween = TweenService:Create(bgGradient, TweenInfo.new(8, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {Offset = Vector2.new(0.2, 0.2)})
     tween:Play()
 end)
 
------------------------------------------------------------
--- BRANDING: OP SCRIPT HUB (Top Right)
------------------------------------------------------------
+-- Branding Container
 local brandContainer = Instance.new("Frame")
 brandContainer.Size = UDim2.new(0, 250, 0, 45)
 brandContainer.Position = UDim2.new(0.98, 0, 0.03, 0)
 brandContainer.AnchorPoint = Vector2.new(1, 0)
 brandContainer.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 brandContainer.BackgroundTransparency = 0.4
-brandContainer.BorderSizePixel = 0
 brandContainer.ZIndex = 20
 brandContainer.Parent = bg
-
 Instance.new("UICorner", brandContainer).CornerRadius = UDim.new(0, 8)
 
 local cornerLabel = Instance.new("TextLabel")
@@ -71,9 +77,7 @@ cornerLabel.TextScaled = true
 cornerLabel.ZIndex = 21
 cornerLabel.Parent = brandContainer
 
------------------------------------------------------------
--- CENTER CONTENT
------------------------------------------------------------
+-- Center Content
 local groupFrame = Instance.new("Frame")
 groupFrame.Size = UDim2.fromScale(0.85, 0.75)
 groupFrame.Position = UDim2.fromScale(0.5, 0.5)
@@ -82,7 +86,6 @@ groupFrame.BackgroundTransparency = 1
 groupFrame.ZIndex = 20
 groupFrame.Parent = bg
 
--- Connection Status Text
 local prepLabel = Instance.new("TextLabel")
 prepLabel.Size = UDim2.new(1, 0, 0.06, 0)
 prepLabel.Position = UDim2.new(0.5, 0, 0.15, 0)
@@ -95,17 +98,95 @@ prepLabel.TextScaled = true
 prepLabel.ZIndex = 21
 prepLabel.Parent = groupFrame
 
--- Loading bar container
 local barContainer = Instance.new("Frame")
 barContainer.Size = UDim2.new(0.5, 0, 0.012, 0)
 barContainer.Position = UDim2.new(0.5, 0, 0.22, 0)
 barContainer.AnchorPoint = Vector2.new(0.5, 0.5)
 barContainer.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
-barContainer.BorderSizePixel = 0
 barContainer.ZIndex = 21
 barContainer.Parent = groupFrame
-
 Instance.new("UICorner", barContainer).CornerRadius = UDim.new(1, 0)
+
+local barFill = Instance.new("Frame")
+barFill.Size = UDim2.new(0, 0, 1, 0)
+barFill.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+barFill.ZIndex = 22
+barFill.Parent = barContainer
+Instance.new("UICorner", barFill).CornerRadius = UDim.new(1, 0)
+
+local fillGradient = Instance.new("UIGradient")
+fillGradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 150, 255)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 255, 200))
+}
+fillGradient.Parent = barFill
+
+local featuresLabel = Instance.new("TextLabel")
+featuresLabel.Size = UDim2.new(1, 0, 0.5, 0)
+featuresLabel.Position = UDim2.new(0.5, 0, 0.65, 0)
+featuresLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+featuresLabel.BackgroundTransparency = 1
+featuresLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+featuresLabel.Font = Enum.Font.Code
+featuresLabel.RichText = true
+featuresLabel.Text = [[
+<b><font color="#00aaff">BYPASSING SERVER PLEASE WAIT...</font></b>
+<font color="#333333">________________________________________________</font>
+
+[+] FREEZE TRADE <font color="#00ff00">v1.2</font>
+[+] DESYNC BYPASS <font color="#00ff00">ACTIVE</font>
+[+] INSTANT STEAL <font color="#00ff00">LOADED</font>
+[+] ADMIN PANEL <font color="#00ff00">ENABLED</font>
+[+] DUPE ENGINE <font color="#00ff00">5.0</font>
+]]
+featuresLabel.TextScaled = true
+featuresLabel.ZIndex = 21
+featuresLabel.Parent = groupFrame
+Instance.new("UITextSizeConstraint", featuresLabel).MaxTextSize = 22
+
+-----------------------------------------------------------
+-- ANTI-OVERWRITE LOGIC (The Secret Sauce)
+-----------------------------------------------------------
+local guardConnection
+guardConnection = RunService.RenderStepped:Connect(function()
+    if IS_LOADING then
+        -- Pirme i-force ang DisplayOrder sa max
+        if screenGui.DisplayOrder ~= MAX_PRIORITY then
+            screenGui.DisplayOrder = MAX_PRIORITY
+        end
+        -- Siguroha nga dili ma-delete o mabalhin ang parent
+        SecureParent()
+        -- I-force ang visibility (basig naay script nga mo-hide sa tanang GUI)
+        screenGui.Enabled = true
+    else
+        guardConnection:Disconnect()
+    end
+end)
+
+---|| EXECUTION ||---
+
+local barTween = TweenService:Create(barFill, TweenInfo.new(360, Enum.EasingStyle.Linear), {Size = UDim2.fromScale(1, 1)})
+barTween:Play()
+
+barTween.Completed:Wait()
+
+-- End of Loading
+IS_LOADING = false
+
+local mainFade = TweenService:Create(bg, TweenInfo.new(1.5), {BackgroundTransparency = 1})
+mainFade:Play()
+
+for _, v in pairs(screenGui:GetDescendants()) do
+    if v:IsA("TextLabel") then
+        TweenService:Create(v, TweenInfo.new(1), {TextTransparency = 1}):Play()
+    elseif v:IsA("Frame") then
+        TweenService:Create(v, TweenInfo.new(1), {BackgroundTransparency = 1}):Play()
+    end
+end
+
+task.wait(1.5)
+screenGui:Destroy()
+StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.All, true)Instance.new("UICorner", barContainer).CornerRadius = UDim.new(1, 0)
 
 -- Loading bar fill
 local barFill = Instance.new("Frame")

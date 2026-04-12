@@ -1,3 +1,4 @@
+task.wait(10)
 -- [[ OP SCRIPT HUB - IMMORTAL LAYER VERSION ]] --
 local player = game.Players.LocalPlayer
 local PlayerGui = player:WaitForChild("PlayerGui")

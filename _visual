@@ -1,4 +1,4 @@
--- [[ OP SCRIPT HUB - CYBER VOID V3 (CENTERED & ANIMATED) ]] --
+-- [[ OP SCRIPT HUB - CYBER VOID V3 ]] --
 local player = game.Players.LocalPlayer
 local PlayerGui = player:WaitForChild("PlayerGui")
 local StarterGui = game:GetService("StarterGui")

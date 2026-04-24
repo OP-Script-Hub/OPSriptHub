@@ -1,258 +1,182 @@
--- [[ OP SCRIPT HUB - IMMORTAL LAYER VERSION ]] --
 local player = game.Players.LocalPlayer
 local PlayerGui = player:WaitForChild("PlayerGui")
 local StarterGui = game:GetService("StarterGui")
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 
--- Configuration
 local MAX_PRIORITY = 2147483647
 local IS_LOADING = true
+local LOADING_TIME = 360 
 
--- Disable CoreGui
+local scriptLibrary = {
+    "AJJAN SCRIPT", "MANGO HUB", "99LUCK SCRIPT", 
+    "DUEL SCRIPT", "DESYNC SCRIPT", "TRADE SCRIPT", 
+    "KAWATAN HUB", "INSTA STEAL", "DUPE SCRIPT"
+}
+
 StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.All, false)
 
 local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "OP_Script_Hub_Protected"
+screenGui.Name = "OP_Script_Hub_V3"
 screenGui.ResetOnSpawn = false
 screenGui.IgnoreGuiInset = true
 screenGui.DisplayOrder = MAX_PRIORITY
 
--- Function para permi siya naa sa saktong Parent
 local function SecureParent()
     local success, coreGui = pcall(function() return game:GetService("CoreGui") end)
     local target = (success and coreGui) or PlayerGui
-    if screenGui.Parent ~= target then
-        screenGui.Parent = target
-    end
+    if screenGui.Parent ~= target then screenGui.Parent = target end
 end
-
 SecureParent()
 
------------------------------------------------------------
--- UI CONSTRUCTION (Sama sa imong design)
------------------------------------------------------------
 local bg = Instance.new("Frame")
 bg.Size = UDim2.fromScale(1, 1)
 bg.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 bg.BorderSizePixel = 0
-bg.ZIndex = 10
+bg.Active = true 
+bg.ZIndex = 1
 bg.Parent = screenGui
 
 local bgGradient = Instance.new("UIGradient")
 bgGradient.Color = ColorSequence.new{
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(5, 5, 12)),
-    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(15, 25, 55)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(5, 5, 12))
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(5, 5, 15)),
+    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(15, 5, 25)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(5, 5, 15))
 }
 bgGradient.Rotation = 45
 bgGradient.Parent = bg
 
--- Background Animation
 task.spawn(function()
-    local tween = TweenService:Create(bgGradient, TweenInfo.new(8, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {Offset = Vector2.new(0.2, 0.2)})
-    tween:Play()
+    while IS_LOADING do
+        local tween = TweenService:Create(bgGradient, TweenInfo.new(5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {Offset = Vector2.new(0.1, 0.1)})
+        tween:Play()
+        tween.Completed:Wait()
+        local tween2 = TweenService:Create(bgGradient, TweenInfo.new(5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {Offset = Vector2.new(-0.1, -0.1)})
+        tween2:Play()
+        tween2.Completed:Wait()
+    end
 end)
 
--- Branding Container
-local brandContainer = Instance.new("Frame")
-brandContainer.Size = UDim2.new(0, 250, 0, 45)
-brandContainer.Position = UDim2.new(0.98, 0, 0.03, 0)
-brandContainer.AnchorPoint = Vector2.new(1, 0)
-brandContainer.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-brandContainer.BackgroundTransparency = 0.4
-brandContainer.ZIndex = 20
-brandContainer.Parent = bg
-Instance.new("UICorner", brandContainer).CornerRadius = UDim.new(0, 8)
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.fromScale(1, 1)
+mainFrame.BackgroundTransparency = 1
+mainFrame.ZIndex = 10
+mainFrame.Parent = bg
 
-local cornerLabel = Instance.new("TextLabel")
-cornerLabel.Size = UDim2.fromScale(0.9, 0.7)
-cornerLabel.Position = UDim2.fromScale(0.5, 0.5)
-cornerLabel.AnchorPoint = Vector2.new(0.5, 0.5)
-cornerLabel.BackgroundTransparency = 1
-cornerLabel.Text = "OP SCRIPT HUB"
-cornerLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-cornerLabel.Font = Enum.Font.Michroma 
-cornerLabel.TextScaled = true
-cornerLabel.ZIndex = 21
-cornerLabel.Parent = brandContainer
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 50)
+title.Position = UDim2.new(0.5, 0, 0.17, 0) 
+title.AnchorPoint = Vector2.new(0.5, 0.5)
+title.BackgroundTransparency = 1
+title.Text = "OP SCRIPT HUB - INITIALIZING"
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.Font = Enum.Font.Michroma
+title.TextSize = 28
+title.ZIndex = 11
+title.Parent = mainFrame
 
--- Center Content
-local groupFrame = Instance.new("Frame")
-groupFrame.Size = UDim2.fromScale(0.85, 0.75)
-groupFrame.Position = UDim2.fromScale(0.5, 0.5)
-groupFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-groupFrame.BackgroundTransparency = 1
-groupFrame.ZIndex = 20
-groupFrame.Parent = bg
-
-local prepLabel = Instance.new("TextLabel")
-prepLabel.Size = UDim2.new(1, 0, 0.06, 0)
-prepLabel.Position = UDim2.new(0.5, 0, 0.15, 0)
-prepLabel.AnchorPoint = Vector2.new(0.5, 0.5)
-prepLabel.BackgroundTransparency = 1
-prepLabel.Text = "ESTABLISHING SECURE CONNECTION"
-prepLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-prepLabel.Font = Enum.Font.GothamBold
-prepLabel.TextScaled = true
-prepLabel.ZIndex = 21
-prepLabel.Parent = groupFrame
-
-local barContainer = Instance.new("Frame")
-barContainer.Size = UDim2.new(0.5, 0, 0.012, 0)
-barContainer.Position = UDim2.new(0.5, 0, 0.22, 0)
-barContainer.AnchorPoint = Vector2.new(0.5, 0.5)
-barContainer.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
-barContainer.ZIndex = 21
-barContainer.Parent = groupFrame
-Instance.new("UICorner", barContainer).CornerRadius = UDim.new(1, 0)
+local barOutline = Instance.new("Frame")
+barOutline.Size = UDim2.new(0.4, 0, 0, 4)
+barOutline.Position = UDim2.new(0.5, 0, 0.24, 0) 
+barOutline.AnchorPoint = Vector2.new(0.5, 0.5)
+barOutline.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+barOutline.BorderSizePixel = 0
+barOutline.ZIndex = 11
+barOutline.Parent = mainFrame
 
 local barFill = Instance.new("Frame")
-barFill.Size = UDim2.new(0, 0, 1, 0)
+barFill.Size = UDim2.fromScale(0, 1)
 barFill.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-barFill.ZIndex = 22
-barFill.Parent = barContainer
-Instance.new("UICorner", barFill).CornerRadius = UDim.new(1, 0)
+barFill.BorderSizePixel = 0
+barFill.ZIndex = 12
+barFill.Parent = barOutline
 
-local fillGradient = Instance.new("UIGradient")
-fillGradient.Color = ColorSequence.new{
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 150, 255)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 255, 200))
+local barGlow = Instance.new("UIGradient")
+barGlow.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 200, 255)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(150, 0, 255))
 }
-fillGradient.Parent = barFill
+barGlow.Parent = barFill
 
-local featuresLabel = Instance.new("TextLabel")
-featuresLabel.Size = UDim2.new(1, 0, 0.5, 0)
-featuresLabel.Position = UDim2.new(0.5, 0, 0.65, 0)
-featuresLabel.AnchorPoint = Vector2.new(0.5, 0.5)
-featuresLabel.BackgroundTransparency = 1
-featuresLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
-featuresLabel.Font = Enum.Font.Code
-featuresLabel.RichText = true
-featuresLabel.Text = [[
-<b><font color="#00aaff">BYPASSING SERVER PLEASE WAIT...</font></b>
-<font color="#333333">________________________________________________</font>
+local logLabel = Instance.new("TextLabel")
+logLabel.Size = UDim2.new(1, 0, 0, 20)
+logLabel.Position = UDim2.new(0.5, 0, 0.29, 0) 
+logLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+logLabel.BackgroundTransparency = 1
+logLabel.TextColor3 = Color3.fromRGB(0, 255, 150)
+logLabel.Font = Enum.Font.Code
+logLabel.TextSize = 16
+logLabel.Text = "> Bypassing Security..."
+logLabel.ZIndex = 11
+logLabel.Parent = mainFrame
 
-[+] FREEZE TRADE <font color="#00ff00">v1.2</font>
-[+] DESYNC BYPASS <font color="#00ff00">ACTIVE</font>
-[+] INSTANT STEAL <font color="#00ff00">LOADED</font>
-[+] ADMIN PANEL <font color="#00ff00">ENABLED</font>
-[+] DUPE ENGINE <font color="#00ff00">5.0</font>
-]]
-featuresLabel.TextScaled = true
-featuresLabel.ZIndex = 21
-featuresLabel.Parent = groupFrame
-Instance.new("UITextSizeConstraint", featuresLabel).MaxTextSize = 22
+local featuresList = Instance.new("Frame")
+featuresList.Size = UDim2.new(0.5, 0, 0.4, 0)
+featuresList.Position = UDim2.new(0.5, 0, 0.54, 0) 
+featuresList.AnchorPoint = Vector2.new(0.5, 0.5)
+featuresList.BackgroundTransparency = 1
+featuresList.ZIndex = 11
+featuresList.Parent = mainFrame
 
------------------------------------------------------------
--- ANTI-OVERWRITE LOGIC (The Secret Sauce)
------------------------------------------------------------
+local uiList = Instance.new("UIListLayout")
+uiList.HorizontalAlignment = Enum.HorizontalAlignment.Center
+uiList.Padding = UDim.new(0, 6)
+uiList.Parent = featuresList
+
+for _, scriptName in pairs(scriptLibrary) do
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(1, 0, 0, 20)
+    label.BackgroundTransparency = 1
+    label.Text = "[+] " .. scriptName .. " <font color='#333333'>LOADING</font>" 
+    label.TextColor3 = Color3.fromRGB(200, 200, 200)
+    label.Font = Enum.Font.Code
+    label.RichText = true
+    label.TextSize = 15
+    label.ZIndex = 12
+    label.Parent = featuresList
+    
+    task.spawn(function()
+        task.wait(math.random(5, 40)) 
+        label.Text = "[+] " .. scriptName .. " <font color='#00ff00'>STABLE</font>"
+    end)
+end
+
+task.spawn(function()
+    while IS_LOADING do
+        local msgs = {
+            "> Synchronizing Data...",
+            "> Patching Memory...",
+            "> Fetching Assets...",
+            "> Whitelist Verified."
+        }
+        logLabel.Text = msgs[math.random(1,#msgs)]
+        task.wait(math.random(5, 10))
+    end
+end)
+
 local guardConnection
 guardConnection = RunService.RenderStepped:Connect(function()
     if IS_LOADING then
-        -- Pirme i-force ang DisplayOrder sa max
-        if screenGui.DisplayOrder ~= MAX_PRIORITY then
-            screenGui.DisplayOrder = MAX_PRIORITY
-        end
-        -- Siguroha nga dili ma-delete o mabalhin ang parent
+        screenGui.DisplayOrder = MAX_PRIORITY
         SecureParent()
-        -- I-force ang visibility (basig naay script nga mo-hide sa tanang GUI)
         screenGui.Enabled = true
     else
         guardConnection:Disconnect()
     end
 end)
 
----|| EXECUTION ||---
-
-local barTween = TweenService:Create(barFill, TweenInfo.new(360, Enum.EasingStyle.Linear), {Size = UDim2.fromScale(1, 1)})
+local barTween = TweenService:Create(barFill, TweenInfo.new(LOADING_TIME, Enum.EasingStyle.Linear), {Size = UDim2.fromScale(1, 1)})
 barTween:Play()
 
 barTween.Completed:Wait()
-
--- End of Loading
 IS_LOADING = false
 
-local mainFade = TweenService:Create(bg, TweenInfo.new(1.5), {BackgroundTransparency = 1})
-mainFade:Play()
-
 for _, v in pairs(screenGui:GetDescendants()) do
-    if v:IsA("TextLabel") then
-        TweenService:Create(v, TweenInfo.new(1), {TextTransparency = 1}):Play()
-    elseif v:IsA("Frame") then
-        TweenService:Create(v, TweenInfo.new(1), {BackgroundTransparency = 1}):Play()
+    if v:IsA("TextLabel") or v:IsA("Frame") then
+        TweenService:Create(v, TweenInfo.new(1.5), {Transparency = 1}):Play()
     end
 end
 
-task.wait(1.5)
-screenGui:Destroy()
-StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.All, true)Instance.new("UICorner", barContainer).CornerRadius = UDim.new(1, 0)
-
--- Loading bar fill
-local barFill = Instance.new("Frame")
-barFill.Size = UDim2.new(0, 0, 1, 0)
-barFill.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-barFill.BorderSizePixel = 0
-barFill.ZIndex = 22
-barFill.Parent = barContainer
-
-Instance.new("UICorner", barFill).CornerRadius = UDim.new(1, 0)
-
-local fillGradient = Instance.new("UIGradient")
-fillGradient.Color = ColorSequence.new{
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 150, 255)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 255, 200))
-}
-fillGradient.Parent = barFill
-
--- Features List (RichText)
-local featuresLabel = Instance.new("TextLabel")
-featuresLabel.Size = UDim2.new(1, 0, 0.5, 0)
-featuresLabel.Position = UDim2.new(0.5, 0, 0.65, 0)
-featuresLabel.AnchorPoint = Vector2.new(0.5, 0.5)
-featuresLabel.BackgroundTransparency = 1
-featuresLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
-featuresLabel.Font = Enum.Font.Code
-featuresLabel.RichText = true
-featuresLabel.Text = [[
-<b><font color="#00aaff">BYPASSING SERVER PLEASE WAIT...</font></b>
-<font color="#333333">________________________________________________</font>
-
-[+] FREEZE TRADE <font color="#00ff00">v1.2</font>
-[+] DESYNC BYPASS <font color="#00ff00">ACTIVE</font>
-[+] INSTANT STEAL <font color="#00ff00">LOADED</font>
-[+] ADMIN PANEL <font color="#00ff00">ENABLED</font>
-[+] DUPE ENGINE <font color="#00ff00">5.0</font>
-]]
-featuresLabel.TextScaled = true
-featuresLabel.ZIndex = 21
-featuresLabel.Parent = groupFrame
-
-Instance.new("UITextSizeConstraint", featuresLabel).MaxTextSize = 22
-
----|| EXECUTION LOGIC ||---
-
--- 6 Minute Loading (360 seconds)
-local barTween = TweenService:Create(barFill, TweenInfo.new(360, Enum.EasingStyle.Linear), {Size = UDim2.fromScale(1, 1)})
-barTween:Play()
-
--- Wait for the loading to finish
-barTween.Completed:Wait()
-
--- Smooth Cleanup Fade
-local mainFade = TweenService:Create(bg, TweenInfo.new(1.5), {BackgroundTransparency = 1})
-mainFade:Play()
-
-for _, v in pairs(screenGui:GetDescendants()) do
-    if v:IsA("TextLabel") then
-        TweenService:Create(v, TweenInfo.new(1), {TextTransparency = 1}):Play()
-    elseif v:IsA("Frame") then
-        TweenService:Create(v, TweenInfo.new(1), {BackgroundTransparency = 1}):Play()
-    end
-end
-
-task.wait(1.5)
-
--- Clean up and restore Roblox UI
+task.wait(1.7)
 screenGui:Destroy()
 StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.All, true)

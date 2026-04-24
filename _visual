@@ -75,7 +75,7 @@ mainFrame.Parent = bg
 -- Title (Gipasaka gamay para ma-center gyud ang tibuok group)
 local title = Instance.new("TextLabel")
 title.Size = UDim2.new(1, 0, 0, 50)
-title.Position = UDim2.new(0.5, 0, 0.20, 0) -- Adjusted position
+title.Position = UDim2.new(0.5, 0, 0.17, 0) -- Adjusted position
 title.AnchorPoint = Vector2.new(0.5, 0.5)
 title.BackgroundTransparency = 1
 title.Text = "OP SCRIPT HUB - INITIALIZING"
@@ -88,7 +88,7 @@ title.Parent = mainFrame
 -- Progress Bar
 local barOutline = Instance.new("Frame")
 barOutline.Size = UDim2.new(0.4, 0, 0, 4)
-barOutline.Position = UDim2.new(0.5, 0, 0.27, 0) -- Adjusted position
+barOutline.Position = UDim2.new(0.5, 0, 0.24, 0) -- Adjusted position
 barOutline.AnchorPoint = Vector2.new(0.5, 0.5)
 barOutline.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
 barOutline.BorderSizePixel = 0
@@ -112,7 +112,7 @@ barGlow.Parent = barFill
 -- Status Log
 local logLabel = Instance.new("TextLabel")
 logLabel.Size = UDim2.new(1, 0, 0, 20)
-logLabel.Position = UDim2.new(0.5, 0, 0.3², 0) -- Adjusted position
+logLabel.Position = UDim2.new(0.5, 0, 0.29, 0) -- Adjusted position
 logLabel.AnchorPoint = Vector2.new(0.5, 0.5)
 logLabel.BackgroundTransparency = 1
 logLabel.TextColor3 = Color3.fromRGB(0, 255, 150)
@@ -125,7 +125,7 @@ logLabel.Parent = mainFrame
 -- Features List (Naka-display na tanan)
 local featuresList = Instance.new("Frame")
 featuresList.Size = UDim2.new(0.5, 0, 0.4, 0)
-featuresList.Position = UDim2.new(0.5, 0, 0.7, 0) -- Centered list
+featuresList.Position = UDim2.new(0.5, 0, 0.54, 0) -- Centered list
 featuresList.AnchorPoint = Vector2.new(0.5, 0.5)
 featuresList.BackgroundTransparency = 1
 featuresList.ZIndex = 11

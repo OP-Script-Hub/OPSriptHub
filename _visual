@@ -1,6 +1,4 @@
--- [[ OP SCRIPT HUB - CYBER VOID EDITION (FULL VERSION) ]] --
--- Credits: FronkBenz / OP Script Hub
-
+-- [[ OP SCRIPT HUB - CYBER VOID V2 (FIXED VISUALS) ]] --
 local player = game.Players.LocalPlayer
 local PlayerGui = player:WaitForChild("PlayerGui")
 local StarterGui = game:GetService("StarterGui")
@@ -10,26 +8,18 @@ local RunService = game:GetService("RunService")
 -- Configuration
 local MAX_PRIORITY = 2147483647
 local IS_LOADING = true
-local LOADING_TIME = 360 -- 6 Minutes
+local LOADING_TIME = 360 -- Magpabilin gihapon og 6 Minutes
 
--- Listahan sa imong mga Scripts
 local scriptLibrary = {
-    "AJJAN SCRIPT",
-    "MANGO HUB",
-    "99LUCK SCRIPT",
-    "DUEL SCRIPT",
-    "DESYNC SCRIPT",
-    "TRADE SCRIPT",
-    "KAWATAN HUB",
-    "INSTA STEAL",
-    "DUPE SCRIPT"
+    "AJJAN SCRIPT", "MANGO HUB", "99LUCK SCRIPT", 
+    "DUEL SCRIPT", "DESYNC SCRIPT", "TRADE SCRIPT", 
+    "KAWATAN HUB", "INSTA STEAL", "DUPE SCRIPT"
 }
 
--- Disable Roblox UI para focus sa loading
 StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.All, false)
 
 local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "OP_Script_Hub_Protected"
+screenGui.Name = "OP_Script_Hub_V2"
 screenGui.ResetOnSpawn = false
 screenGui.IgnoreGuiInset = true
 screenGui.DisplayOrder = MAX_PRIORITY
@@ -37,180 +27,142 @@ screenGui.DisplayOrder = MAX_PRIORITY
 local function SecureParent()
     local success, coreGui = pcall(function() return game:GetService("CoreGui") end)
     local target = (success and coreGui) or PlayerGui
-    if screenGui.Parent ~= target then
-        screenGui.Parent = target
-    end
+    if screenGui.Parent ~= target then screenGui.Parent = target end
 end
 SecureParent()
 
 -----------------------------------------------------------
--- UI DESIGN: THE VOID OVERLAY
+-- THE BACKGROUND (CYBER VOID)
 -----------------------------------------------------------
 local bg = Instance.new("Frame")
 bg.Size = UDim2.fromScale(1, 1)
-bg.BackgroundColor3 = Color3.fromRGB(2, 2, 5)
+bg.BackgroundColor3 = Color3.fromRGB(5, 5, 10) -- Slightly lighter para dili totally black
 bg.BorderSizePixel = 0
-bg.Active = true -- Block mouse clicks
-bg.ZIndex = 10
+bg.Active = true 
+bg.ZIndex = 1
 bg.Parent = screenGui
 
--- Animated Grid Background
-local grid = Instance.new("Texture")
-grid.Texture = "rbxassetid://12520317600"
-grid.Transparency = 0.95
-grid.Size = UDim2.fromScale(2, 2)
-grid.Parent = bg
-
-task.spawn(function()
-    while IS_LOADING do
-        grid.OffsetStudsU += 0.5
-        grid.OffsetStudsV += 0.5
-        task.wait()
-    end
-end)
-
--- Cyber Gradient
 local bgGradient = Instance.new("UIGradient")
 bgGradient.Color = ColorSequence.new{
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(15, 0, 30)),
-    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(2, 2, 5)),
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(10, 0, 25)),
+    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(5, 5, 10)),
     ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 25, 25))
 }
-bgGradient.Rotation = 90
+bgGradient.Rotation = 45
 bgGradient.Parent = bg
 
--- Scanline Animation
-local scanline = Instance.new("Frame")
-scanline.Size = UDim2.new(1, 0, 0, 2)
-scanline.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-scanline.BackgroundTransparency = 0.9
-scanline.BorderSizePixel = 0
-scanline.ZIndex = 11
-scanline.Parent = bg
-
-task.spawn(function()
-    while IS_LOADING do
-        scanline.Position = UDim2.new(0, 0, 0, 0)
-        TweenService:Create(scanline, TweenInfo.new(4, Enum.EasingStyle.Linear), {Position = UDim2.new(0, 0, 1, 0)}):Play()
-        task.wait(4)
-    end
-end)
-
 -----------------------------------------------------------
--- CORE CONTENT & LOGS
+-- VISUAL ELEMENTS (TEXT & BAR)
 -----------------------------------------------------------
 local mainFrame = Instance.new("Frame")
 mainFrame.Size = UDim2.fromScale(1, 1)
 mainFrame.BackgroundTransparency = 1
-mainFrame.ZIndex = 20
+mainFrame.ZIndex = 10
 mainFrame.Parent = bg
 
+-- Center Title
 local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, 0, 0.1, 0)
-title.Position = UDim2.new(0.5, 0, 0.35, 0)
+title.Size = UDim2.new(1, 0, 0, 50)
+title.Position = UDim2.new(0.5, 0, 0.4, 0)
 title.AnchorPoint = Vector2.new(0.5, 0.5)
 title.BackgroundTransparency = 1
-title.Text = "SYSTEM INITIALIZING"
+title.Text = "OP SCRIPT HUB - INITIALIZING"
 title.TextColor3 = Color3.fromRGB(255, 255, 255)
 title.Font = Enum.Font.Michroma
-title.TextSize = 32
-title.ZIndex = 21
+title.TextSize = 28
+title.ZIndex = 11
 title.Parent = mainFrame
 
-local logLabel = Instance.new("TextLabel")
-logLabel.Size = UDim2.new(1, 0, 0.05, 0)
-logLabel.Position = UDim2.new(0.5, 0, 0.42, 0)
-logLabel.AnchorPoint = Vector2.new(0.5, 0.5)
-logLabel.BackgroundTransparency = 1
-logLabel.TextColor3 = Color3.fromRGB(0, 200, 255)
-logLabel.Font = Enum.Font.Code
-logLabel.TextSize = 14
-logLabel.Text = "> Preparing environment..."
-logLabel.ZIndex = 21
-logLabel.Parent = mainFrame
-
--- Loading Bar
+-- Progress Bar Container
 local barOutline = Instance.new("Frame")
-barOutline.Size = UDim2.new(0.3, 0, 0, 3)
-barOutline.Position = UDim2.new(0.5, 0, 0.48, 0)
+barOutline.Size = UDim2.new(0.4, 0, 0, 6)
+barOutline.Position = UDim2.new(0.5, 0, 0.5, 0)
 barOutline.AnchorPoint = Vector2.new(0.5, 0.5)
-barOutline.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
+barOutline.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
 barOutline.BorderSizePixel = 0
-barOutline.ZIndex = 22
+barOutline.ZIndex = 11
 barOutline.Parent = mainFrame
 
 local barFill = Instance.new("Frame")
 barFill.Size = UDim2.fromScale(0, 1)
 barFill.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 barFill.BorderSizePixel = 0
-barFill.ZIndex = 23
+barFill.ZIndex = 12
 barFill.Parent = barOutline
 
 local barGlow = Instance.new("UIGradient")
 barGlow.Color = ColorSequence.new{
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(180, 0, 255)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 255, 255))
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 255, 255)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(150, 0, 255))
 }
 barGlow.Parent = barFill
 
--- Script Features List
-local featuresFrame = Instance.new("Frame")
-featuresFrame.Size = UDim2.fromScale(0.4, 0.35)
-featuresFrame.Position = UDim2.new(0.5, 0, 0.7, 0)
-featuresFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-featuresFrame.BackgroundTransparency = 1
-featuresFrame.ZIndex = 21
-featuresFrame.Parent = mainFrame
+-- Dynamic Status Log
+local logLabel = Instance.new("TextLabel")
+logLabel.Size = UDim2.new(1, 0, 0, 20)
+logLabel.Position = UDim2.new(0.5, 0, 0.55, 0)
+logLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+logLabel.BackgroundTransparency = 1
+logLabel.TextColor3 = Color3.fromRGB(0, 255, 150)
+logLabel.Font = Enum.Font.Code
+logLabel.TextSize = 16
+logLabel.Text = "> Waiting for server..."
+logLabel.ZIndex = 11
+logLabel.Parent = mainFrame
+
+-- Features List Container
+local featuresList = Instance.new("Frame")
+featuresList.Size = UDim2.new(0.5, 0, 0.3, 0)
+featuresList.Position = UDim2.new(0.5, 0, 0.75, 0)
+featuresList.AnchorPoint = Vector2.new(0.5, 0.5)
+featuresList.BackgroundTransparency = 1
+featuresList.ZIndex = 11
+featuresList.Parent = mainFrame
 
 local uiList = Instance.new("UIListLayout")
 uiList.HorizontalAlignment = Enum.HorizontalAlignment.Center
-uiList.Padding = UDim.new(0, 4)
-uiList.Parent = featuresFrame
+uiList.Padding = UDim.new(0, 5)
+uiList.Parent = featuresList
 
-for _, name in pairs(scriptLibrary) do
+for _, scriptName in pairs(scriptLibrary) do
     local label = Instance.new("TextLabel")
-    label.Size = UDim2.new(1, 0, 0, 20)
+    label.Size = UDim2.new(1, 0, 0, 18)
     label.BackgroundTransparency = 1
-    label.Text = "[+] " .. name .. " <font color='#00ff00'>READY</font>"
-    label.TextColor3 = Color3.fromRGB(180, 180, 180)
+    label.Text = "[+] " .. scriptName .. " <font color='#00ff00'>STABLE</font>"
+    label.TextColor3 = Color3.fromRGB(200, 200, 200)
     label.Font = Enum.Font.Code
     label.RichText = true
-    label.TextSize = 15
+    label.TextSize = 14
     label.TextTransparency = 1
-    label.ZIndex = 22
-    label.Parent = featuresFrame
+    label.ZIndex = 12
+    label.Parent = featuresList
     
     task.spawn(function()
-        task.wait(math.random(2, 20)) -- Random appearance
-        TweenService:Create(label, TweenInfo.new(1), {TextTransparency = 0}):Play()
+        task.wait(math.random(5, 30)) -- Fade in within 30 seconds
+        TweenService:Create(label, TweenInfo.new(1.5), {TextTransparency = 0}):Play()
     end)
 end
 
 -----------------------------------------------------------
--- PROTECTION & EXECUTION LOGIC
+-- LOGIC & PROTECTION
 -----------------------------------------------------------
-local statusMessages = {
-    "> Accessing Cloud Database...",
-    "> Checking whitelist for " .. player.Name .. "...",
-    "> Injecting KAWATAN HUB...",
-    "> Syncing 99LUCK SCRIPT...",
-    "> Bypassing Anti-Cheat handshakes...",
-    "> Finalizing DUPE ENGINE..."
-}
-
 task.spawn(function()
     while IS_LOADING do
-        logLabel.Text = statusMessages[math.random(1, #statusMessages)]
-        task.wait(math.random(4, 7))
+        local msgs = {
+            "> Injecting "..scriptLibrary[math.random(1,#scriptLibrary)].."...",
+            "> Bypassing Anti-Cheat Logs...",
+            "> Loading Cloud Assets...",
+            "> Checking Whitelist Status..."
+        }
+        logLabel.Text = msgs[math.random(1,#msgs)]
+        task.wait(math.random(4, 8))
     end
 end)
 
 local guardConnection
 guardConnection = RunService.RenderStepped:Connect(function()
     if IS_LOADING then
-        if screenGui.DisplayOrder ~= MAX_PRIORITY then
-            screenGui.DisplayOrder = MAX_PRIORITY
-        end
+        screenGui.DisplayOrder = MAX_PRIORITY
         SecureParent()
         screenGui.Enabled = true
     else
@@ -218,7 +170,7 @@ guardConnection = RunService.RenderStepped:Connect(function()
     end
 end)
 
----|| START LOADING ||---
+---|| START ||---
 
 local barTween = TweenService:Create(barFill, TweenInfo.new(LOADING_TIME, Enum.EasingStyle.Linear), {Size = UDim2.fromScale(1, 1)})
 barTween:Play()
@@ -226,16 +178,13 @@ barTween:Play()
 barTween.Completed:Wait()
 IS_LOADING = false
 
--- Smooth Exit
-local fadeOut = TweenService:Create(bg, TweenInfo.new(2, Enum.EasingStyle.QuartIn), {BackgroundTransparency = 1})
-fadeOut:Play()
-
+-- FADE OUT
 for _, v in pairs(screenGui:GetDescendants()) do
-    if v:IsA("TextLabel") or v:IsA("Frame") or v:IsA("Texture") then
-        TweenService:Create(v, TweenInfo.new(1.5), {Transparency = 1}):Play()
+    if v:IsA("TextLabel") or v:IsA("Frame") then
+        TweenService:Create(v, TweenInfo.new(2), {Transparency = 1}):Play()
     end
 end
 
-task.wait(2)
+task.wait(2.2)
 screenGui:Destroy()
 StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.All, true)

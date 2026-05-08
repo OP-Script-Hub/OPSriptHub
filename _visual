@@ -31,7 +31,7 @@ SecureParent()
 
 local bg = Instance.new("Frame")
 bg.Size = UDim2.fromScale(1, 1)
-bg.BackgroundColor3 = Color3.fromRGB(245, 245, 250) -- Hayag nga Background (Off-white/Blue tint)
+bg.BackgroundColor3 = Color3.fromRGB(245, 245, 250) 
 bg.BorderSizePixel = 0
 bg.Active = true 
 bg.ZIndex = 1
@@ -69,24 +69,24 @@ title.Position = UDim2.new(0.5, 0, 0.17, 0)
 title.AnchorPoint = Vector2.new(0.5, 0.5)
 title.BackgroundTransparency = 1
 title.Text = "OP SCRIPT HUB - INITIALIZING"
-title.TextColor3 = Color3.fromRGB(40, 40, 60) -- Dark Text para klaro sa hayag nga BG
-title.Font = Enum.Font.Michroma
-title.TextSize = 28
+title.TextColor3 = Color3.fromRGB(20, 20, 40) 
+title.Font = Enum.Font.GothamBold -- Gihimong Baga
+title.TextSize = 30 -- Gidakoan gamay
 title.ZIndex = 11
 title.Parent = mainFrame
 
 local barOutline = Instance.new("Frame")
-barOutline.Size = UDim2.new(0.4, 0, 0, 4)
+barOutline.Size = UDim2.new(0.4, 0, 0, 6) -- Gibag-an ang outline
 barOutline.Position = UDim2.new(0.5, 0, 0.24, 0) 
 barOutline.AnchorPoint = Vector2.new(0.5, 0.5)
-barOutline.BackgroundColor3 = Color3.fromRGB(210, 215, 225) -- Light Grey Outline
+barOutline.BackgroundColor3 = Color3.fromRGB(200, 205, 215) 
 barOutline.BorderSizePixel = 0
 barOutline.ZIndex = 11
 barOutline.Parent = mainFrame
 
 local barFill = Instance.new("Frame")
 barFill.Size = UDim2.fromScale(0, 1)
-barFill.BackgroundColor3 = Color3.fromRGB(0, 120, 255) -- Deep Blue Fill
+barFill.BackgroundColor3 = Color3.fromRGB(0, 120, 255) 
 barFill.BorderSizePixel = 0
 barFill.ZIndex = 12
 barFill.Parent = barOutline
@@ -103,9 +103,9 @@ logLabel.Size = UDim2.new(1, 0, 0, 20)
 logLabel.Position = UDim2.new(0.5, 0, 0.29, 0) 
 logLabel.AnchorPoint = Vector2.new(0.5, 0.5)
 logLabel.BackgroundTransparency = 1
-logLabel.TextColor3 = Color3.fromRGB(0, 100, 200) -- Clean Blue Log Text
-logLabel.Font = Enum.Font.Code
-logLabel.TextSize = 16
+logLabel.TextColor3 = Color3.fromRGB(0, 80, 180) 
+logLabel.Font = Enum.Font.RobotoMono -- Mas baga ug limpyo
+logLabel.TextSize = 18 -- Gidakoan
 logLabel.Text = "> Bypassing Security..."
 logLabel.ZIndex = 11
 logLabel.Parent = mainFrame
@@ -120,24 +120,24 @@ featuresList.Parent = mainFrame
 
 local uiList = Instance.new("UIListLayout")
 uiList.HorizontalAlignment = Enum.HorizontalAlignment.Center
-uiList.Padding = UDim.new(0, 6)
+uiList.Padding = UDim.new(0, 8) -- Mas dako nga padding
 uiList.Parent = featuresList
 
 for _, scriptName in pairs(scriptLibrary) do
     local label = Instance.new("TextLabel")
-    label.Size = UDim2.new(1, 0, 0, 20)
+    label.Size = UDim2.new(1, 0, 0, 22)
     label.BackgroundTransparency = 1
-    label.Text = "[+] " .. scriptName .. " <font color='#A0A0A0'>LOADING</font>" 
-    label.TextColor3 = Color3.fromRGB(100, 100, 110) -- Semi-dark for readability
-    label.Font = Enum.Font.Code
+    label.Text = "<b>[+] " .. scriptName .. "</b> <font color='#808080'><b>LOADING</b></font>" -- Gigamitan og <b> tag
+    label.TextColor3 = Color3.fromRGB(60, 60, 70) 
+    label.Font = Enum.Font.GothamBold -- Gihimong Baga
     label.RichText = true
-    label.TextSize = 15
+    label.TextSize = 17 -- Gidakoan
     label.ZIndex = 12
     label.Parent = featuresList
     
     task.spawn(function()
         task.wait(math.random(5, 40)) 
-        label.Text = "[+] " .. scriptName .. " <font color='#009000'>STABLE</font>" -- Darker Green para hayag gihapon
+        label.Text = "<b>[+] " .. scriptName .. "</b> <font color='#007000'><b>STABLE</b></font>"
     end)
 end
 
@@ -149,7 +149,8 @@ task.spawn(function()
             "> Fetching Assets...",
             "> Whitelist Verified."
         }
-        logLabel.Text = msgs[math.random(1,#msgs)]
+        logLabel.Text = "<b>" .. msgs[math.random(1,#msgs)] .. "</b>"
+        logLabel.RichText = true
         task.wait(math.random(5, 10))
     end
 end)

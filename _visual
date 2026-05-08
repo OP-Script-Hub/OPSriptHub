@@ -10,8 +10,8 @@ local LOADING_TIME = 360
 
 local scriptLibrary = {
     "AJJAN SCRIPT", "MANGO HUB", "KURD HUB", 
-    "DUEL SCRIPT", "DESYNC SCRIPT", "TRADE SCRIPT", 
-    "KAWATAN HUB", "INSTA STEAL", "DUPE SCRIPT"
+    "DUEL SCRIPT", "KAWATAN HUB", "TRADE SCRIPT", 
+    "DESYNC SCRIPT", "INSTANT STEAL", "DUPE SCRIPT"
 }
 
 StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.All, false)

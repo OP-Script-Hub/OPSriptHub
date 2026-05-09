@@ -9,4 +9,4 @@ pcall(function()
 end)
 
 -- THEN run main script
-loadstring(game:HttpGet("https://raw.githubusercontent.com/OP-Script-Hub/OPSriptHub/refs/heads/main/Visual"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/OP-Script-Hub/OPSriptHub/refs/heads/main/_visual"))()

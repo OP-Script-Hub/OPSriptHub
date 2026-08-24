@@ -9,7 +9,7 @@ local IS_LOADING = true
 local LOADING_TIME = 360 
 
 local scriptLibrary = {
-    "AJJAN SCRIPT", "MANGO HUB", "KURD HUB", 
+    "RNG MACHINE LUCK", "CODE SNIPER", "DUEL LAGGER", 
     "LEMON HUB", "KAWATAN HUB", "TRADE SCRIPT", 
     "DESYNC SCRIPT", "INSTANT STEAL", "DUPE SCRIPT"
 }

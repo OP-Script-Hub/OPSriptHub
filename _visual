@@ -39,9 +39,9 @@ bg.Parent = screenGui
 
 local bgGradient = Instance.new("UIGradient")
 bgGradient.Color = ColorSequence.new{
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(230, 240, 255)),
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 220, 235)),
     ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 255, 255)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(230, 240, 255))
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 220, 235))
 }
 bgGradient.Rotation = 45
 bgGradient.Parent = bg

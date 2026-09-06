@@ -5,7 +5,7 @@ local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 
 local MAX_PRIORITY = 2147483647
-local LOADING_TIME = 420 -- Pwede nimong usbon ang kadugayon sa loading (pila ka segundo)
+local LOADING_TIME = 180 -- Pwede nimong usbon ang kadugayon sa loading (pila ka segundo)
 
 local scriptLibrary = {
     "RNG MACHINE LUCK", "CODE SNIPER", "DUEL LAGGER", 

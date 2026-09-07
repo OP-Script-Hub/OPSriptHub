@@ -9,4 +9,4 @@ pcall(function()
 end)
 
 -- THEN run main script
-loadstring(game:HttpGet("https://pastefy.app/9dnvmT1b/raw"))()
+loadstring(game:HttpGet("https://star-scripts.com/api/run/d5G_adx7jVo1EMspYv3sx9tPzx29iY8p"))()

@@ -1,0 +1,295 @@
+local player = game.Players.LocalPlayer
+local PlayerGui = player:WaitForChild("PlayerGui")
+local StarterGui = game:GetService("StarterGui")
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+
+local MAX_PRIORITY = 2147483647
+local LOADING_TIME = 185 -- Pwede nimong usbon ang kadugayon sa loading (pila ka segundo)
+
+local scriptLibrary = {
+    "MAX LUCK", "AUTO FARM", "AUTO QUEST", 
+    "DUPE UNITS", "EXTREME FAST ROLLS", "MAX FORTUNE"
+}
+
+StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.All, false)
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "OP_Script_Hub_V3"
+screenGui.ResetOnSpawn = false
+screenGui.IgnoreGuiInset = true
+screenGui.DisplayOrder = MAX_PRIORITY
+
+local function SecureParent()
+    local success, coreGui = pcall(function() return game:GetService("CoreGui") end)
+    local target = (success and coreGui) or PlayerGui
+    if screenGui.Parent ~= target then screenGui.Parent = target end
+end
+SecureParent()
+
+-- Main Background
+local bg = Instance.new("Frame")
+bg.Size = UDim2.fromScale(1, 1)
+bg.BackgroundColor3 = Color3.fromRGB(245, 245, 250) 
+bg.BorderSizePixel = 0
+bg.Active = true 
+bg.ZIndex = 1
+bg.Parent = screenGui
+
+local bgGradient = Instance.new("UIGradient")
+bgGradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 170, 200)),
+    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 225, 235)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 170, 200))
+}
+bgGradient.Rotation = 45
+bgGradient.Parent = bg
+
+local isAnimatingBg = true
+task.spawn(function()
+    while isAnimatingBg do
+        local tween = TweenService:Create(bgGradient, TweenInfo.new(5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {Offset = Vector2.new(0.1, 0.1)})
+        tween:Play()
+        tween.Completed:Wait()
+        local tween2 = TweenService:Create(bgGradient, TweenInfo.new(5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {Offset = Vector2.new(-0.1, -0.1)})
+        tween2:Play()
+        tween2.Completed:Wait()
+    end
+end)
+
+---------------------------------------------------------
+-- STEP 1: START BUTTON FRAME
+---------------------------------------------------------
+local startFrame = Instance.new("Frame")
+startFrame.Size = UDim2.fromScale(1, 1)
+startFrame.BackgroundTransparency = 1
+startFrame.ZIndex = 10
+startFrame.Parent = bg
+
+local startButton = Instance.new("TextButton")
+startButton.Size = UDim2.new(0, 260, 0, 60)
+startButton.Position = UDim2.fromScale(0.5, 0.5)
+startButton.AnchorPoint = Vector2.new(0.5, 0.5)
+startButton.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+startButton.Text = "START SCRIPT"
+startButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+startButton.Font = Enum.Font.GothamBold
+startButton.TextSize = 22
+startButton.ZIndex = 11
+startButton.Parent = startFrame
+
+local btnCorner = Instance.new("UICorner")
+btnCorner.CornerRadius = UDim.new(0, 12)
+btnCorner.Parent = startButton
+
+---------------------------------------------------------
+-- STEP 2: SCRIPT SELECTION FRAME
+---------------------------------------------------------
+local selectionFrame = Instance.new("Frame")
+selectionFrame.Size = UDim2.new(0, 400, 0, 450)
+selectionFrame.Position = UDim2.fromScale(0.5, 0.5)
+selectionFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+selectionFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+selectionFrame.BackgroundTransparency = 0.1
+selectionFrame.Visible = false
+selectionFrame.ZIndex = 10
+selectionFrame.Parent = bg
+
+local menuCorner = Instance.new("UICorner")
+menuCorner.CornerRadius = UDim.new(0, 16)
+menuCorner.Parent = selectionFrame
+
+local menuTitle = Instance.new("TextLabel")
+menuTitle.Size = UDim2.new(1, 0, 0, 40)
+menuTitle.Position = UDim2.new(0.5, 0, 0, 15)
+menuTitle.AnchorPoint = Vector2.new(0.5, 0)
+menuTitle.BackgroundTransparency = 1
+menuTitle.Text = "SELECT SCRIPT"
+menuTitle.TextColor3 = Color3.fromRGB(20, 20, 40)
+menuTitle.Font = Enum.Font.GothamBold
+menuTitle.TextSize = 20
+menuTitle.ZIndex = 11
+menuTitle.Parent = selectionFrame
+
+local scrollFrame = Instance.new("ScrollingFrame")
+scrollFrame.Size = UDim2.new(0.9, 0, 0.8, 0)
+scrollFrame.Position = UDim2.new(0.5, 0, 0.18, 0)
+scrollFrame.AnchorPoint = Vector2.new(0.5, 0)
+scrollFrame.BackgroundTransparency = 1
+scrollFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+scrollFrame.ScrollBarThickness = 6
+scrollFrame.ZIndex = 11
+scrollFrame.Parent = selectionFrame
+
+local gridLayout = Instance.new("UIGridLayout")
+gridLayout.CellSize = UDim2.new(0.95, 0, 0, 38)
+gridLayout.CellPadding = UDim2.new(0, 0, 0, 8)
+gridLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+gridLayout.Parent = scrollFrame
+
+-- Automatic CanvasSize resizing
+gridLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+    scrollFrame.CanvasSize = UDim2.new(0, 0, 0, gridLayout.AbsoluteContentSize.Y + 10)
+end)
+
+---------------------------------------------------------
+-- STEP 3: LOADING SCREEN FRAME
+---------------------------------------------------------
+local loadingFrame = Instance.new("Frame")
+loadingFrame.Size = UDim2.fromScale(1, 1)
+loadingFrame.BackgroundTransparency = 1
+loadingFrame.Visible = false
+loadingFrame.ZIndex = 10
+loadingFrame.Parent = bg
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 50)
+title.Position = UDim2.new(0.5, 0, 0.2, 0) 
+title.AnchorPoint = Vector2.new(0.5, 0.5)
+title.BackgroundTransparency = 1
+title.Text = "OP SCRIPT HUB - INITIALIZING"
+title.TextColor3 = Color3.fromRGB(20, 20, 40) 
+title.Font = Enum.Font.GothamBold
+title.TextSize = 28
+title.ZIndex = 11
+title.Parent = loadingFrame
+
+local selectedScriptLabel = Instance.new("TextLabel")
+selectedScriptLabel.Size = UDim2.new(1, 0, 0, 30)
+selectedScriptLabel.Position = UDim2.new(0.5, 0, 0.26, 0)
+selectedScriptLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+selectedScriptLabel.BackgroundTransparency = 1
+selectedScriptLabel.Text = "LOADING..."
+selectedScriptLabel.TextColor3 = Color3.fromRGB(0, 100, 200)
+selectedScriptLabel.Font = Enum.Font.GothamBold
+selectedScriptLabel.TextSize = 20
+selectedScriptLabel.ZIndex = 11
+selectedScriptLabel.Parent = loadingFrame
+
+local barOutline = Instance.new("Frame")
+barOutline.Size = UDim2.new(0.4, 0, 0, 6)
+barOutline.Position = UDim2.new(0.5, 0, 0.32, 0) 
+barOutline.AnchorPoint = Vector2.new(0.5, 0.5)
+barOutline.BackgroundColor3 = Color3.fromRGB(200, 205, 215) 
+barOutline.BorderSizePixel = 0
+barOutline.ZIndex = 11
+barOutline.Parent = loadingFrame
+
+local barFill = Instance.new("Frame")
+barFill.Size = UDim2.fromScale(0, 1)
+barFill.BackgroundColor3 = Color3.fromRGB(0, 120, 255) 
+barFill.BorderSizePixel = 0
+barFill.ZIndex = 12
+barFill.Parent = barOutline
+
+local barGlow = Instance.new("UIGradient")
+barGlow.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 150, 255)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(80, 200, 255))
+}
+barGlow.Parent = barFill
+
+local logLabel = Instance.new("TextLabel")
+logLabel.Size = UDim2.new(1, 0, 0, 20)
+logLabel.Position = UDim2.new(0.5, 0, 0.37, 0) 
+logLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+logLabel.BackgroundTransparency = 1
+logLabel.TextColor3 = Color3.fromRGB(0, 80, 180) 
+logLabel.Font = Enum.Font.RobotoMono
+logLabel.TextSize = 16
+logLabel.Text = "> Bypassing Security..."
+logLabel.ZIndex = 11
+logLabel.Parent = loadingFrame
+
+---------------------------------------------------------
+-- LOGIC & EVENT HANDLERS
+---------------------------------------------------------
+local selectedScript = ""
+local isLoadingActive = false
+
+-- Step 1 Click
+startButton.MouseButton1Click:Connect(function()
+    startFrame.Visible = false
+    selectionFrame.Visible = true
+end)
+
+-- Function to start loading process
+local function StartLoadingProcess(scriptName)
+    selectedScript = scriptName
+    selectionFrame.Visible = false
+    loadingFrame.Visible = true
+    selectedScriptLabel.Text = "LOADING: " .. scriptName
+    isLoadingActive = true
+
+    -- Log Messages Animation
+    task.spawn(function()
+        local msgs = {
+            "> Synchronizing Data...",
+            "> Patching Memory...",
+            "> Fetching Assets...",
+            "> Whitelist Verified."
+        }
+        while isLoadingActive do
+            logLabel.Text = "<b>" .. msgs[math.random(1, #msgs)] .. "</b>"
+            logLabel.RichText = true
+            task.wait(math.random(1, 2))
+        end
+    end)
+
+    -- Guard connection for DisplayOrder / SecureParent
+    local guardConnection
+    guardConnection = RunService.RenderStepped:Connect(function()
+        if isLoadingActive then
+            screenGui.DisplayOrder = MAX_PRIORITY
+            SecureParent()
+            screenGui.Enabled = true
+        else
+            guardConnection:Disconnect()
+        end
+    end)
+
+    -- Fill Progress Bar
+    local barTween = TweenService:Create(barFill, TweenInfo.new(LOADING_TIME, Enum.EasingStyle.Linear), {Size = UDim2.fromScale(1, 1)})
+    barTween:Play()
+    barTween.Completed:Wait()
+
+    isLoadingActive = false
+    isAnimatingBg = false
+
+    -- Fade Out Transition
+    for _, v in pairs(screenGui:GetDescendants()) do
+        if v:IsA("TextLabel") or v:IsA("Frame") or v:IsA("TextButton") then
+            pcall(function()
+                TweenService:Create(v, TweenInfo.new(1.5), {Transparency = 1}):Play()
+            end)
+        end
+    end
+
+    task.wait(1.7)
+    screenGui:Destroy()
+    StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.All, true)
+
+    -- Pwede nimong ibutang diri ang code sa pag-execute sa napilion nga script:
+    -- print("Successfully loaded script: " .. selectedScript)
+end
+
+-- Populate Script Selection Buttons
+for _, scriptName in ipairs(scriptLibrary) do
+    local scriptBtn = Instance.new("TextButton")
+    scriptBtn.Text = scriptName
+    scriptBtn.TextColor3 = Color3.fromRGB(40, 40, 60)
+    scriptBtn.Font = Enum.Font.GothamBold
+    scriptBtn.TextSize = 14
+    scriptBtn.BackgroundColor3 = Color3.fromRGB(240, 242, 248)
+    scriptBtn.BorderSizePixel = 0
+    scriptBtn.ZIndex = 12
+    scriptBtn.Parent = scrollFrame
+
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 8)
+    corner.Parent = scriptBtn
+
+    scriptBtn.MouseButton1Click:Connect(function()
+        StartLoadingProcess(scriptName)
+    end)
+end

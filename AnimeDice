@@ -9,4 +9,4 @@ pcall(function()
 end)
 
 -- THEN run main script
-loadstring(game:HttpGet("https://cdn.sourceb.in/bins/MaRJamlRar/0"))()
+loadstring(game:HttpGet("https://cdn.sourceb.in/bins/6RPq8cgwRB/0"))()

